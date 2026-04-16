@@ -16,6 +16,13 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
+      required: function () {
+        return !this.provider || this.provider === 'credentials';
+      },
+    },
+    provider: {
+      type: String,
+      enum: ['credentials', 'google', 'github'],
       required: true,
     },
     role: {

@@ -8,7 +8,7 @@ import type { UserRole } from '@/types';
 const navigation = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/organizations', label: 'Organizations' },
-  { href: '#', label: 'Assessments' },
+  { href: '/assessments', label: 'Assessments' },
   { href: '#', label: 'Interviews' },
   { href: '#', label: 'Case Studies' },
   { href: '#', label: 'Security Checks' },

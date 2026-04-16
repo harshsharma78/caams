@@ -68,3 +68,154 @@ export const organizationSchema = z.object({
 });
 
 export const objectIdSchema = z.string().regex(/^[a-f\d]{24}$/i, 'Invalid ID.');
+
+export const assessmentCategoryKeys = [
+  'infrastructure-readiness',
+  'security-compliance',
+  'application-portability',
+  'data-management',
+  'team-skills-readiness',
+  'cost-roi-analysis',
+] as const;
+
+export const assessmentQuestionIdsByCategory = {
+  'infrastructure-readiness': [
+    'infra-inventory',
+    'infra-virtualization',
+    'infra-networking',
+    'infra-monitoring',
+    'infra-automation',
+  ],
+  'security-compliance': [
+    'security-iam',
+    'security-compliance-controls',
+    'security-data-protection',
+    'security-incident-response',
+    'security-vulnerability-management',
+  ],
+  'application-portability': [
+    'app-architecture',
+    'app-dependencies',
+    'app-containerization',
+    'app-ci-cd',
+    'app-testing',
+  ],
+  'data-management': [
+    'data-classification',
+    'data-backup-recovery',
+    'data-integration',
+    'data-governance',
+    'data-performance',
+  ],
+  'team-skills-readiness': [
+    'team-cloud-skills',
+    'team-change-management',
+    'team-ownership',
+    'team-training',
+    'team-executive-support',
+  ],
+  'cost-roi-analysis': [
+    'cost-baseline',
+    'cost-finops',
+    'cost-business-case',
+    'cost-kpi-tracking',
+    'cost-risk-planning',
+  ],
+} as const;
+
+const assessmentQuestionResponseSchema = z.object({
+  id: z.string().trim().min(1, 'Question ID is required.'),
+  score: z
+    .number({
+      error: 'Question score is required.',
+    })
+    .int('Question score must be a whole number.')
+    .min(1, 'Question score must be between 1 and 5.')
+    .max(5, 'Question score must be between 1 and 5.'),
+});
+
+const assessmentCategoryResponseSchema = z.object({
+  key: z.enum(assessmentCategoryKeys),
+  questions: z
+    .array(assessmentQuestionResponseSchema)
+    .length(5, 'Each category must include 5 scored questions.'),
+});
+
+export const assessmentInputSchema = z
+  .object({
+    orgId: objectIdSchema,
+    categories: z
+      .array(assessmentCategoryResponseSchema)
+      .length(6, 'The assessment must include all 6 categories.'),
+  })
+  .superRefine((value, context) => {
+    const categorySet = new Set<string>();
+
+    value.categories.forEach((category, categoryIndex) => {
+      if (categorySet.has(category.key)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['categories', categoryIndex, 'key'],
+          message: 'Duplicate category provided.',
+        });
+        return;
+      }
+
+      categorySet.add(category.key);
+
+      const expectedQuestionIds = assessmentQuestionIdsByCategory[category.key];
+      const questionSet = new Set<string>();
+
+      category.questions.forEach((question, questionIndex) => {
+        if (!expectedQuestionIds.includes(question.id as never)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [
+              'categories',
+              categoryIndex,
+              'questions',
+              questionIndex,
+              'id',
+            ],
+            message: 'Unexpected question for category.',
+          });
+        }
+
+        if (questionSet.has(question.id)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [
+              'categories',
+              categoryIndex,
+              'questions',
+              questionIndex,
+              'id',
+            ],
+            message: 'Duplicate question provided.',
+          });
+        }
+
+        questionSet.add(question.id);
+      });
+
+      expectedQuestionIds.forEach((questionId) => {
+        if (!questionSet.has(questionId)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['categories', categoryIndex, 'questions'],
+            message: `Missing question response: ${questionId}.`,
+          });
+        }
+      });
+    });
+
+    assessmentCategoryKeys.forEach((key) => {
+      if (!categorySet.has(key)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['categories'],
+          message: `Missing category response: ${key}.`,
+        });
+      }
+    });
+  });
