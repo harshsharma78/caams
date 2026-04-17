@@ -123,24 +123,22 @@ export function OrganizationForm({
           }}>
           <div className='grid gap-5 md:grid-cols-2'>
             <Input
-              label='Organization name'
+              label='Organization'
               value={values.name}
               onChange={(event) => handleChange('name', event.target.value)}
-              placeholder='Nimbus Health'
+              placeholder='Enter Organization Name'
               error={fieldErrors.name}
-              required
             />
             <Input
               label='Industry'
               value={values.industry}
               onChange={(event) => handleChange('industry', event.target.value)}
-              placeholder='Healthcare'
+              placeholder='Enter Industry'
               error={fieldErrors.industry}
-              required
             />
             <label className='block space-y-1.5'>
               <span className='text-sm font-medium text-slate-700 dark:text-slate-200'>
-                Organization size
+                Organization Size
               </span>
               <Select
                 value={values.size}
@@ -164,44 +162,39 @@ export function OrganizationForm({
               label='Sector'
               value={values.sector}
               onChange={(event) => handleChange('sector', event.target.value)}
-              placeholder='Private'
+              placeholder='Enter Sector'
               error={fieldErrors.sector}
-              required
             />
             <Input
-              label='Contact person'
+              label='Contact Name'
               value={values.contactPerson}
               onChange={(event) =>
                 handleChange('contactPerson', event.target.value)
               }
-              placeholder='Aarav Singh'
+              placeholder='Enter Contact Name'
               error={fieldErrors.contactPerson}
-              required
             />
             <Input
-              label='Contact email'
+              label='Contact Email'
               value={values.email}
               onChange={(event) => handleChange('email', event.target.value)}
-              placeholder='contact@nimbushealth.com'
+              placeholder='Enter Contact Email'
               type='email'
               error={fieldErrors.email}
-              required
             />
             <Input
-              label='Phone number'
+              label='Phone Number'
               value={values.phone}
               onChange={(event) => handleChange('phone', event.target.value)}
-              placeholder='+91 98765 43210'
+              placeholder='Enter Phone Number'
               error={fieldErrors.phone}
-              required
             />
             <Input
               label='Address'
               value={values.address}
               onChange={(event) => handleChange('address', event.target.value)}
-              placeholder='Bhopal, Madhya Pradesh'
+              placeholder='Enter Address'
               error={fieldErrors.address}
-              required
             />
           </div>
           <div className='grid gap-5 md:grid-cols-[1fr_220px]'>

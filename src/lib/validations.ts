@@ -34,8 +34,8 @@ export const organizationSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(2, 'Organization name is required.')
-    .max(100, 'Organization name must be 100 characters or fewer.'),
+    .min(2, 'Organization is required.')
+    .max(100, 'Organization must be 100 characters or fewer.'),
   industry: z
     .string()
     .trim()
@@ -55,14 +55,14 @@ export const organizationSchema = z.object({
   contactPerson: z
     .string()
     .trim()
-    .min(2, 'Contact person is required.')
-    .max(60, 'Contact person must be 60 characters or fewer.'),
+    .min(2, 'Contact Name is required.')
+    .max(60, 'Contact name must be 60 characters or fewer.'),
   email: emailSchema,
   phone: z
     .string()
     .trim()
-    .min(7, 'Phone number is required.')
-    .max(20, 'Phone number must be 20 characters or fewer.')
+    .min(7, 'Phone Number is required.')
+    .max(10, 'Phone number must be 10 characters or fewer.')
     .regex(/^[+\d\s()-]+$/, 'Enter a valid phone number.'),
   logoUrl: z.url('Logo URL must be valid.').or(z.literal('')).default(''),
 });
@@ -219,3 +219,49 @@ export const assessmentInputSchema = z
       }
     });
   });
+
+export const STANDARD_INTERVIEW_QUESTIONS = [
+  'What is your current IT infrastructure setup?',
+  'Has your organization adopted any cloud services? If yes, which ones?',
+  'What were the primary drivers for cloud adoption?',
+  'What challenges did you face during/before cloud migration?',
+  'How does your organization handle data security in the cloud?',
+  'What compliance requirements do you need to meet?',
+  'How has cloud adoption impacted operational costs?',
+  'What skills gaps exist in your team regarding cloud technologies?',
+  'What would you recommend to organizations planning cloud adoption?',
+  'What are the biggest misconceptions about cloud computing in your industry?',
+] as const;
+
+const interviewResponseSchema = z.object({
+  question: z.string().trim().min(1, 'Question is required.'),
+  answer: z.string().trim().default(''),
+});
+
+export const interviewSchema = z.object({
+  orgId: objectIdSchema,
+  intervieweeName: z
+    .string()
+    .trim()
+    .min(2, 'Interviewee name must be at least 2 characters.')
+    .max(100, 'Interviewee name must be 100 characters or fewer.'),
+  designation: z
+    .string()
+    .trim()
+    .min(2, 'Designation is required.')
+    .max(100, 'Designation must be 100 characters or fewer.'),
+  department: z
+    .string()
+    .trim()
+    .min(2, 'Department is required.')
+    .max(100, 'Department must be 100 characters or fewer.'),
+  experience: z
+    .string()
+    .trim()
+    .min(1, 'Years of experience is required.')
+    .max(50, 'Experience must be 50 characters or fewer.'),
+  responses: z
+    .array(interviewResponseSchema)
+    .length(10, 'All 10 interview questions must be included.'),
+  fileUrl: z.url('File URL must be valid.').or(z.literal('')).default(''),
+});

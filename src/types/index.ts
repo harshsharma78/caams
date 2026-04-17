@@ -64,3 +64,35 @@ export interface AssessmentDetail extends AssessmentListItem {
   assessor?: UserSummary | null;
   categories: AssessmentCategoryScore[];
 }
+
+export interface InterviewResponse {
+  question: string;
+  answer: string;
+}
+
+export interface InterviewFormValues {
+  orgId: string;
+  intervieweeName: string;
+  designation: string;
+  department: string;
+  experience: string;
+  responses: InterviewResponse[];
+  fileUrl: string;
+}
+
+export interface InterviewListItem {
+  id: string;
+  orgId: string;
+  organizationName: string;
+  intervieweeName: string;
+  designation: string;
+  department: string;
+  experience: string;
+  date: string;
+  conductedBy?: UserSummary | null;
+}
+
+export interface InterviewDetail extends InterviewListItem {
+  responses: InterviewResponse[];
+  fileUrl: string;
+}

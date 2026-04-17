@@ -22,7 +22,8 @@ export async function middleware(request: NextRequest) {
     // Protect routes
     const isProtectedRoute =
       pathname.startsWith('/dashboard') ||
-      pathname.startsWith('/organizations');
+      pathname.startsWith('/organizations') ||
+      pathname.startsWith('/interviews');
 
     if (isProtectedRoute && !isAuthenticated) {
       const loginUrl = new URL('/login', request.url);
@@ -47,6 +48,14 @@ export async function middleware(request: NextRequest) {
       (pathname.endsWith('/new') || pathname.endsWith('/edit'))
     ) {
       return NextResponse.redirect(new URL('/organizations', request.url));
+    }
+
+    if (
+      pathname.startsWith('/interviews') &&
+      role === 'viewer' &&
+      pathname.endsWith('/new')
+    ) {
+      return NextResponse.redirect(new URL('/interviews', request.url));
     }
 
     return NextResponse.next();
