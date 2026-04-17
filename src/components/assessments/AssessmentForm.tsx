@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { assessmentInputSchema } from '@/lib/validations';
 
 interface AssessmentFormProps {
   organizations: { id: string; name: string }[];
@@ -241,36 +242,34 @@ export function AssessmentForm({ organizations }: AssessmentFormProps) {
                 type='button'
                 disabled={isPending}
                 onClick={() => {
-                  if (!organizationId) {
-                    setError('Select an organization before saving.');
-                    return;
-                  }
+                  const payload = {
+                    orgId: organizationId,
+                    categories: ASSESSMENT_CATEGORIES.map((category) => ({
+                      key: category.key,
+                      questions: category.questions.map((question) => ({
+                        id: question.id,
+                        score: responses[category.key][question.id] ?? 1,
+                      })),
+                    })),
+                  };
 
-                  if (!isAssessmentComplete) {
-                    setError('Complete all 30 questions before saving.');
+                  const parsed = assessmentInputSchema.safeParse(payload);
+
+                  if (!parsed.success) {
+                    const firstIssue = parsed.error.issues[0];
+                    setError(firstIssue?.message ?? 'Invalid assessment data.');
                     return;
                   }
 
                   setError('');
 
                   startTransition(async () => {
-                    const payload = {
-                      orgId: organizationId,
-                      categories: ASSESSMENT_CATEGORIES.map((category) => ({
-                        key: category.key,
-                        questions: category.questions.map((question) => ({
-                          id: question.id,
-                          score: responses[category.key][question.id] ?? 1,
-                        })),
-                      })),
-                    };
-
                     const response = await fetch('/api/assessments', {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
                       },
-                      body: JSON.stringify(payload),
+                      body: JSON.stringify(parsed.data),
                     });
 
                     const data = (await response.json()) as {

@@ -72,6 +72,7 @@ export function AssessmentList({
           <Input
             label='Min score'
             type='number'
+            className='no-spinner'
             min={0}
             max={100}
             value={minScore}
@@ -81,6 +82,7 @@ export function AssessmentList({
           <Input
             label='Max score'
             type='number'
+            className='no-spinner'
             min={0}
             max={100}
             value={maxScore}

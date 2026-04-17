@@ -9,7 +9,7 @@ const navigation = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/organizations', label: 'Organizations' },
   { href: '/assessments', label: 'Assessments' },
-  { href: '#', label: 'Interviews' },
+  { href: '/interviews', label: 'Interviews' },
   { href: '#', label: 'Case Studies' },
   { href: '#', label: 'Security Checks' },
 ];
