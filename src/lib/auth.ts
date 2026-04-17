@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
 import NextAuth, { type DefaultSession, type NextAuthConfig } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import GitHub from 'next-auth/providers/github';
+import Google from 'next-auth/providers/google';
 
 import { dbConnect } from '@/lib/db';
 import { loginSchema } from '@/lib/validations';
@@ -56,6 +58,16 @@ export const authConfig: NextAuthConfig = {
         };
       },
     }),
+    GitHub({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
   ],
   session: {
     strategy: 'jwt',
@@ -64,12 +76,43 @@ export const authConfig: NextAuthConfig = {
     signIn: '/login',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      if (!account?.provider) return true;
+
+      await dbConnect();
+
+      const existingUser = await User.findOne({
+        email: user.email,
+      });
+
+      if (!existingUser) {
+        await User.create({
+          name: user.name,
+          email: user.email,
+          provider: account.provider, // works for google & github
+          role: 'viewer',
+        });
+      }
+
+      return true;
+    },
+    async jwt({ token, user, account }) {
       if (user) {
         token.sub = user.id;
-        token.role = user.role ?? 'admin';
+        token.role = user.role ?? 'viewer';
         token.name = user.name;
         token.email = user.email;
+      }
+
+      // For OAuth providers, fetch the user role from database
+      if (account?.provider === 'github' || account?.provider === 'google') {
+        if (!token.role || token.role === undefined) {
+          await dbConnect();
+          const dbUser = await User.findById(token.sub).lean();
+          if (dbUser) {
+            token.role = dbUser.role || 'viewer';
+          }
+        }
       }
 
       return token;

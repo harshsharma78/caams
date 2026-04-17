@@ -1,5 +1,10 @@
 export type UserRole = 'admin' | 'viewer';
 export type OrganizationSize = 'startup' | 'sme' | 'enterprise';
+export type AssessmentStatus =
+  | 'not-ready'
+  | 'partially-ready'
+  | 'mostly-ready'
+  | 'cloud-ready';
 
 export interface UserSummary {
   id: string;
@@ -24,4 +29,38 @@ export interface OrganizationListItem extends OrganizationFormValues {
   id: string;
   createdAt: string;
   assessmentCount?: number;
+}
+
+export interface AssessmentQuestionScore {
+  id: string;
+  prompt: string;
+  score: number;
+}
+
+export interface AssessmentCategoryScore {
+  key: string;
+  name: string;
+  weight: number;
+  rawScore: number;
+  averageScore: number;
+  percentageScore: number;
+  weightedScore: number;
+  questions: AssessmentQuestionScore[];
+}
+
+export interface AssessmentListItem {
+  id: string;
+  organizationId: string;
+  organizationName: string;
+  overallScore: number;
+  status: AssessmentStatus;
+  statusLabel: string;
+  statusColor: string;
+  recommendation: string;
+  createdAt: string;
+}
+
+export interface AssessmentDetail extends AssessmentListItem {
+  assessor?: UserSummary | null;
+  categories: AssessmentCategoryScore[];
 }
