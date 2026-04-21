@@ -6,12 +6,14 @@ import { usePathname } from 'next/navigation';
 import type { UserRole } from '@/types';
 
 const navigation = [
+  { href: '/admin', label: 'Admin', adminOnly: true },
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/organizations', label: 'Organizations' },
   { href: '/assessments', label: 'Assessments' },
   { href: '/interviews', label: 'Interviews' },
-  { href: '#', label: 'Case Studies' },
-  { href: '#', label: 'Security Checks' },
+  { href: '/reports', label: 'Reports' },
+  { href: '/casestudies', label: 'Case Studies' },
+  { href: '/security', label: 'Security Checks' },
 ];
 
 interface SidebarProps {
@@ -49,27 +51,33 @@ export function Sidebar({ open, role, onClose }: SidebarProps) {
           </p>
         </div>
         <nav className='mt-8 space-y-2'>
-          {navigation.map((item) => {
-            const isActive =
-              item.href !== '#' &&
-              (pathname === item.href ||
-                (item.href !== '/dashboard' && pathname.startsWith(item.href)));
+          {navigation
+            .filter(
+              (item) =>
+                !('adminOnly' in item && item.adminOnly) || role === 'admin',
+            )
+            .map((item) => {
+              const isActive =
+                item.href !== '#' &&
+                (pathname === item.href ||
+                  (item.href !== '/dashboard' &&
+                    pathname.startsWith(item.href)));
 
-            return (
-              <Link
-                key={item.label}
-                href={item.href === '#' ? '/dashboard' : item.href}
-                className={[
-                  'flex items-center rounded-xl px-4 py-3 text-sm font-medium transition',
-                  isActive
-                    ? 'bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white',
-                ].join(' ')}
-                onClick={onClose}>
-                {item.label}
-              </Link>
-            );
-          })}
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href === '#' ? '/dashboard' : item.href}
+                  className={[
+                    'flex items-center rounded-xl px-4 py-3 text-sm font-medium transition',
+                    isActive
+                      ? 'bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white',
+                  ].join(' ')}
+                  onClick={onClose}>
+                  {item.label}
+                </Link>
+              );
+            })}
         </nav>
       </aside>
     </>

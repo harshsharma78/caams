@@ -13,12 +13,7 @@ const securityCheckSchema = new Schema(
         item: { type: String, required: true, trim: true },
         status: {
           type: String,
-          enum: ['pending', 'passed', 'failed', 'not-applicable'],
-          required: true,
-        },
-        riskLevel: {
-          type: String,
-          enum: ['low', 'medium', 'high', 'critical'],
+          enum: ['compliant', 'partial', 'non-compliant'],
           required: true,
         },
         notes: { type: String, default: '', trim: true },

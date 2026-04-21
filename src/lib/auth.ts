@@ -104,14 +104,13 @@ export const authConfig: NextAuthConfig = {
         token.email = user.email;
       }
 
-      // For OAuth providers, fetch the user role from database
+      // For OAuth providers, fetch the user role and ID from database
       if (account?.provider === 'github' || account?.provider === 'google') {
-        if (!token.role || token.role === undefined) {
-          await dbConnect();
-          const dbUser = await User.findById(token.sub).lean();
-          if (dbUser) {
-            token.role = dbUser.role || 'viewer';
-          }
+        await dbConnect();
+        const dbUser = await User.findOne({ email: token.email }).lean();
+        if (dbUser) {
+          token.role = dbUser.role || 'viewer';
+          token.sub = dbUser._id.toString();
         }
       }
 

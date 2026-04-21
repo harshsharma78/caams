@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SECURITY_CHECKLIST_TEMPLATES } from '@/lib/securityEngine';
 
 const emailSchema = z
   .string()
@@ -68,6 +69,124 @@ export const organizationSchema = z.object({
 });
 
 export const objectIdSchema = z.string().regex(/^[a-f\d]{24}$/i, 'Invalid ID.');
+
+export const CASE_STUDY_SECTORS = [
+  'Healthcare',
+  'Finance',
+  'Education',
+  'Retail',
+  'Government',
+  'Manufacturing',
+  'Logistics',
+  'Technology',
+  'Other',
+] as const;
+
+export const SECURITY_STATUS_VALUES = [
+  'compliant',
+  'partial',
+  'non-compliant',
+] as const;
+
+export const SECURITY_RISK_LEVELS = [
+  'low',
+  'medium',
+  'high',
+  'critical',
+] as const;
+
+export const caseStudySchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(3, 'Title must be at least 3 characters.')
+    .max(120, 'Title must be 120 characters or fewer.'),
+  organization: z
+    .string()
+    .trim()
+    .min(2, 'Organization must be at least 2 characters.')
+    .max(100, 'Organization must be 100 characters or fewer.'),
+  sector: z.enum(CASE_STUDY_SECTORS, {
+    error: 'Select a valid sector.',
+  }),
+  challenge: z
+    .string()
+    .trim()
+    .min(20, 'Challenge must be at least 20 characters.')
+    .max(5000, 'Challenge must be 5000 characters or fewer.'),
+  solution: z
+    .string()
+    .trim()
+    .min(20, 'Solution must be at least 20 characters.')
+    .max(5000, 'Solution must be 5000 characters or fewer.'),
+  outcome: z
+    .string()
+    .trim()
+    .min(20, 'Outcome must be at least 20 characters.')
+    .max(5000, 'Outcome must be 5000 characters or fewer.'),
+  results: z
+    .string()
+    .trim()
+    .min(10, 'Results must be at least 10 characters.')
+    .max(2000, 'Results must be 2000 characters or fewer.'),
+  tags: z
+    .array(
+      z
+        .string()
+        .trim()
+        .min(1, 'Tag cannot be empty.')
+        .max(30, 'Tags must be 30 characters or fewer.'),
+    )
+    .max(12, 'Use 12 tags or fewer.')
+    .default([]),
+  fileUrl: z.url('File URL must be valid.').or(z.literal('')).default(''),
+});
+
+const securityChecklistItemSchema = z.object({
+  category: z
+    .string()
+    .trim()
+    .min(2, 'Category is required.')
+    .max(80, 'Category must be 80 characters or fewer.'),
+  item: z
+    .string()
+    .trim()
+    .min(2, 'Checklist item is required.')
+    .max(200, 'Checklist item must be 200 characters or fewer.'),
+  status: z.enum(SECURITY_STATUS_VALUES, {
+    error: 'Select a valid compliance status.',
+  }),
+  notes: z
+    .string()
+    .trim()
+    .max(2000, 'Notes must be 2000 characters or fewer.')
+    .default(''),
+});
+
+export const securityAssessmentSchema = z.object({
+  orgId: objectIdSchema,
+  checklist: z
+    .array(securityChecklistItemSchema)
+    .length(30, 'The security assessment must include 30 checklist items.'),
+}).superRefine((value, context) => {
+  const expectedEntries = SECURITY_CHECKLIST_TEMPLATES.flatMap((category) =>
+    category.items.map((item) => `${category.category}:::${item.item}`),
+  );
+
+  const receivedEntries = value.checklist.map(
+    (item) => `${item.category}:::${item.item}`,
+  );
+
+  expectedEntries.forEach((entry, index) => {
+    if (!receivedEntries.includes(entry)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['checklist', index],
+        message: 'Checklist items do not match the required template.',
+      });
+    }
+  });
+});
 
 export const assessmentCategoryKeys = [
   'infrastructure-readiness',

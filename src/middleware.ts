@@ -23,7 +23,9 @@ export async function middleware(request: NextRequest) {
     const isProtectedRoute =
       pathname.startsWith('/dashboard') ||
       pathname.startsWith('/organizations') ||
-      pathname.startsWith('/interviews');
+      pathname.startsWith('/interviews') ||
+      pathname.startsWith('/reports') ||
+      pathname.startsWith('/admin');
 
     if (isProtectedRoute && !isAuthenticated) {
       const loginUrl = new URL('/login', request.url);
@@ -56,6 +58,11 @@ export async function middleware(request: NextRequest) {
       pathname.endsWith('/new')
     ) {
       return NextResponse.redirect(new URL('/interviews', request.url));
+    }
+
+    // Admin-only restriction
+    if (pathname.startsWith('/admin') && role !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
     return NextResponse.next();
