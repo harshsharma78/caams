@@ -96,3 +96,60 @@ export interface InterviewDetail extends InterviewListItem {
   responses: InterviewResponse[];
   fileUrl: string;
 }
+
+export interface CaseStudyFormValues {
+  title: string;
+  organization: string;
+  sector: string;
+  challenge: string;
+  solution: string;
+  outcome: string;
+  results: string;
+  tags: string[];
+  fileUrl: string;
+}
+
+export interface CaseStudyListItem extends CaseStudyFormValues {
+  id: string;
+  createdAt: string;
+  uploadedBy?: UserSummary | null;
+}
+
+export interface SecurityChecklistItem {
+  category: string;
+  item: string;
+  status: 'compliant' | 'partial' | 'non-compliant';
+  notes: string;
+}
+
+export interface SecurityAssessmentFormValues {
+  orgId: string;
+  checklist: SecurityChecklistItem[];
+}
+
+export interface SecurityCategoryBreakdown {
+  category: string;
+  score: number;
+  maxScore: number;
+  compliantCount: number;
+  partialCount: number;
+  nonCompliantCount: number;
+}
+
+export interface SecurityAssessmentListItem {
+  id: string;
+  orgId: string;
+  organizationName: string;
+  score: number;
+  overallRisk: 'low' | 'medium' | 'high' | 'critical';
+  createdAt: string;
+  conductedBy?: UserSummary | null;
+}
+
+export interface SecurityAssessmentDetail extends SecurityAssessmentListItem {
+  checklist: SecurityChecklistItem[];
+  findings: string[];
+  recommendations: string[];
+  categoryBreakdown: SecurityCategoryBreakdown[];
+  actionItems: string[];
+}

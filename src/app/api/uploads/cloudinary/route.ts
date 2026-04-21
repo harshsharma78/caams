@@ -17,6 +17,8 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const file = formData.get('file');
+    const folder =
+      (formData.get('folder') as string | null)?.trim() || 'caams/organizations';
 
     if (!(file instanceof File)) {
       return NextResponse.json(
@@ -28,7 +30,7 @@ export async function POST(request: Request) {
     const arrayBuffer = await file.arrayBuffer();
     const url = await uploadToCloudinary(
       Buffer.from(arrayBuffer),
-      'caams/organizations',
+      folder,
       file.name,
     );
 
