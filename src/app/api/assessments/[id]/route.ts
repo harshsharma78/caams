@@ -6,6 +6,7 @@ import {
 } from '@/lib/assessmentEngine';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
+import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { assessmentInputSchema, objectIdSchema } from '@/lib/validations';
 import Assessment from '@/models/Assessment';
 import Organization from '@/models/Organization';
@@ -151,6 +152,8 @@ export async function PUT(
       );
     }
 
+    clearAllStatsCaches();
+
     return NextResponse.json({
       message: 'Assessment updated successfully.',
       assessment: {
@@ -198,6 +201,8 @@ export async function DELETE(
         { status: 404 },
       );
     }
+
+    clearAllStatsCaches();
 
     return NextResponse.json({ message: 'Assessment deleted successfully.' });
   } catch (error) {

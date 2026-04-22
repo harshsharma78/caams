@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageOrganizations } from '@/lib/permissions';
+import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { caseStudySchema, objectIdSchema } from '@/lib/validations';
 import CaseStudy from '@/models/CaseStudy';
 
@@ -39,6 +40,8 @@ export async function GET(
         { status: 404 },
       );
     }
+
+    clearAllStatsCaches();
 
     return NextResponse.json({
       caseStudy: {
@@ -166,6 +169,8 @@ export async function DELETE(
         { status: 404 },
       );
     }
+
+    clearAllStatsCaches();
 
     return NextResponse.json({ message: 'Case study deleted successfully.' });
   } catch (error) {

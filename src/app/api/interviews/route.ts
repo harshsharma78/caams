@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageInterviews } from '@/lib/permissions';
+import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { interviewSchema } from '@/lib/validations';
 import Interview from '@/models/Interview';
 import Organization from '@/models/Organization';
@@ -133,6 +134,8 @@ export async function POST(request: Request) {
       ...parsed.data,
       conductedBy: session.user.id,
     });
+
+    clearAllStatsCaches();
 
     return NextResponse.json(
       {

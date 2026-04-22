@@ -7,6 +7,7 @@ import { BookOpen, Search } from 'lucide-react';
 
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { DeleteCaseStudyButton } from '@/components/casestudies/DeleteCaseStudyButton';
 import { Card, CardContent } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Input } from '@/components/ui/Input';
@@ -22,9 +23,13 @@ import type { CaseStudyListItem } from '@/types';
 
 interface CaseStudyLibraryProps {
   caseStudies: CaseStudyListItem[];
+  canManage?: boolean;
 }
 
-export function CaseStudyLibrary({ caseStudies }: CaseStudyLibraryProps) {
+export function CaseStudyLibrary({
+  caseStudies,
+  canManage = false,
+}: CaseStudyLibraryProps) {
   const [search, setSearch] = useState('');
   const [sector, setSector] = useState('all');
 
@@ -128,9 +133,24 @@ export function CaseStudyLibrary({ caseStudies }: CaseStudyLibraryProps) {
                 <div className='text-sm text-slate-500 dark:text-slate-400'>
                   {caseStudy.fileUrl ? 'PDF attached' : 'No file attached'}
                 </div>
-                <Button asChild>
-                  <Link href={`/casestudies/${caseStudy.id}`}>View case study</Link>
-                </Button>
+                <div className='flex items-center gap-3'>
+                  {canManage ? (
+                    <>
+                      <Link
+                        href={`/casestudies/${caseStudy.id}/edit`}
+                        className='text-sm font-medium text-sky-600 transition hover:text-sky-700'>
+                        Edit
+                      </Link>
+                      <DeleteCaseStudyButton
+                        id={caseStudy.id}
+                        title={caseStudy.title}
+                      />
+                    </>
+                  ) : null}
+                  <Button asChild>
+                    <Link href={`/casestudies/${caseStudy.id}`}>View case study</Link>
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

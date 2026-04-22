@@ -113,9 +113,19 @@ function RichTextarea({
   );
 }
 
-export function CaseStudyForm() {
+interface CaseStudyFormProps {
+  mode?: 'create' | 'edit';
+  caseStudyId?: string;
+  initialValues?: CaseStudyFormValues;
+}
+
+export function CaseStudyForm({
+  mode = 'create',
+  caseStudyId,
+  initialValues = defaultValues,
+}: CaseStudyFormProps) {
   const router = useRouter();
-  const [values, setValues] = useState<CaseStudyFormValues>(defaultValues);
+  const [values, setValues] = useState<CaseStudyFormValues>(initialValues);
   const [tagInput, setTagInput] = useState('');
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<
@@ -179,11 +189,16 @@ export function CaseStudyForm() {
             }
 
             startTransition(async () => {
-              const response = await fetch('/api/casestudies', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(parsed.data),
-              });
+              const response = await fetch(
+                mode === 'edit' && caseStudyId
+                  ? `/api/casestudies/${caseStudyId}`
+                  : '/api/casestudies',
+                {
+                  method: mode === 'edit' ? 'PUT' : 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(parsed.data),
+                },
+              );
 
               const data = (await response.json()) as {
                 error?: string;
@@ -196,7 +211,11 @@ export function CaseStudyForm() {
                 return;
               }
 
-              toast.success('Case study saved successfully.');
+              toast.success(
+                mode === 'edit'
+                  ? 'Case study updated successfully.'
+                  : 'Case study saved successfully.',
+              );
               router.push(`/casestudies/${data.caseStudy.id}`);
               router.refresh();
             });
@@ -411,7 +430,13 @@ export function CaseStudyForm() {
             <Button
               type='submit'
               disabled={isPending || isUploading}>
-              {isPending ? 'Saving...' : 'Create case study'}
+              {isPending
+                ? mode === 'edit'
+                  ? 'Updating...'
+                  : 'Saving...'
+                : mode === 'edit'
+                  ? 'Update case study'
+                  : 'Create case study'}
             </Button>
           </div>
         </form>

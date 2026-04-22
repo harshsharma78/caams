@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Input } from '@/components/ui/Input';
+import { DeleteSecurityAssessmentButton } from '@/components/security/DeleteSecurityAssessmentButton';
 import {
   Select,
   SelectContent,
@@ -23,10 +24,12 @@ import type { SecurityAssessmentListItem } from '@/types';
 
 interface SecurityAssessmentListProps {
   assessments: SecurityAssessmentListItem[];
+  canManage?: boolean;
 }
 
 export function SecurityAssessmentList({
   assessments,
+  canManage = false,
 }: SecurityAssessmentListProps) {
   const [search, setSearch] = useState('');
   const [riskFilter, setRiskFilter] = useState('all');
@@ -110,7 +113,22 @@ export function SecurityAssessmentList({
                   Reviewer:{' '}
                   {assessment.conductedBy?.name ?? 'Unknown reviewer'}
                 </p>
-                <div className='mt-auto'>
+                <div className='mt-auto flex items-center justify-between gap-3'>
+                  {canManage ? (
+                    <div className='flex items-center gap-3'>
+                      <Link
+                        href={`/security/${assessment.id}/edit`}
+                        className='text-sm font-medium text-sky-600 transition hover:text-sky-700'>
+                        Edit
+                      </Link>
+                      <DeleteSecurityAssessmentButton
+                        id={assessment.id}
+                        organizationName={assessment.organizationName}
+                      />
+                    </div>
+                  ) : (
+                    <span />
+                  )}
                   <Button asChild>
                     <Link href={`/security/${assessment.id}`}>View assessment</Link>
                   </Button>

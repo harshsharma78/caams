@@ -10,7 +10,7 @@ import User from '@/models/User';
 
 export type AppSessionUser = DefaultSession['user'] & {
   id: string;
-  role: 'admin' | 'viewer';
+  role: 'admin' | 'analyst' | 'viewer' | 'org_manager';
 };
 
 /**
@@ -91,7 +91,22 @@ export const authConfig: NextAuthConfig = {
           email: user.email,
           provider: account.provider, // works for google & github
           role: 'viewer',
+          status: 'active',
+          lastLoginAt: new Date(),
+          sessionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         });
+      } else {
+        await User.updateOne(
+          { _id: existingUser._id },
+          {
+            $set: {
+              lastLoginAt: new Date(),
+              sessionExpiresAt: new Date(
+                Date.now() + 30 * 24 * 60 * 60 * 1000,
+              ),
+            },
+          },
+        );
       }
 
       return true;

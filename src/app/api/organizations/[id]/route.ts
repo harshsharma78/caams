@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageOrganizations } from '@/lib/permissions';
+import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { objectIdSchema, organizationSchema } from '@/lib/validations';
 import Assessment from '@/models/Assessment';
 import Organization from '@/models/Organization';
@@ -141,6 +142,8 @@ export async function PUT(
       );
     }
 
+    clearAllStatsCaches();
+
     return NextResponse.json({
       message: 'Organization updated successfully.',
       organization: {
@@ -193,6 +196,8 @@ export async function DELETE(
         { status: 404 },
       );
     }
+
+    clearAllStatsCaches();
 
     return NextResponse.json({ message: 'Organization deleted successfully.' });
   } catch (error) {

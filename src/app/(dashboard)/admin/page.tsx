@@ -1,32 +1,87 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { Activity } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
 
-import { AdminUserList } from '@/components/admin/AdminUserList';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { Badge } from '@/components/ui/Badge';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { AdminDashboardActions } from '@/components/admin/AdminDashboardActions';
+import { AdminStatsCardGrid } from '@/components/admin/AdminStatsCardGrid';
+import { AssessmentScoresByIndustry } from '@/components/admin/AssessmentScoresByIndustry';
+import { AuditEventsByTypeChart } from '@/components/admin/AuditEventsByTypeChart';
+import { AuditEventsTrendChart } from '@/components/admin/AuditEventsTrendChart';
+import { AuditLogFeed } from '@/components/admin/AuditLogFeed';
+import { CategoryRadarChart } from '@/components/admin/CategoryRadarChart';
+import { InactiveOrgsPanel } from '@/components/admin/InactiveOrgsPanel';
+import { RecentActivityFeed } from '@/components/admin/RecentActivityFeed';
+import { RevenueTrendChart } from '@/components/admin/RevenueTrendChart';
+import { RiskDistributionChart } from '@/components/admin/RiskDistributionChart';
+import { SecurityComplianceHeatmap } from '@/components/admin/SecurityComplianceHeatmap';
+import { SubscriptionBreakdownChart } from '@/components/admin/SubscriptionBreakdownChart';
+import { SystemErrorTrendChart } from '@/components/admin/SystemErrorTrendChart';
+import { SystemHealthCard } from '@/components/admin/SystemHealthCard';
+import { TopOrganizationsOverview } from '@/components/admin/TopOrganizationsOverview';
+import { UserGrowthChart } from '@/components/admin/UserGrowthChart';
+import { UserManagementTable } from '@/components/admin/UserManagementTable';
+import { UsersByRoleChart } from '@/components/admin/UsersByRoleChart';
 import { auth } from '@/lib/auth';
-import { dbConnect } from '@/lib/db';
 import { isAdmin } from '@/lib/permissions';
-import Assessment from '@/models/Assessment';
-import CaseStudy from '@/models/CaseStudy';
-import Interview from '@/models/Interview';
-import Organization from '@/models/Organization';
-import SecurityCheck from '@/models/SecurityCheck';
-import User from '@/models/User';
+import type { AdminDashboardData } from '@/types/admin-dashboard';
 
 export const metadata: Metadata = {
-  title: 'CAAMS | Admin',
+  title: 'CAAMS | Admin Console',
 };
 
-interface RecentAction {
-  id: string;
-  type: string;
-  label: string;
-  date: string;
+export const dynamic = 'force-dynamic';
+
+function SectionHeader({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <div>
+      <h2 className='text-xl font-semibold text-slate-100'>{title}</h2>
+      <p className='mt-1 text-sm text-slate-400'>{subtitle}</p>
+    </div>
+  );
+}
+
+async function getAdminDashboardData() {
+  const headerStore = await headers();
+  const host =
+    headerStore.get('x-forwarded-host') ?? headerStore.get('host') ?? '';
+  const protocol =
+    headerStore.get('x-forwarded-proto') ??
+    (process.env.NODE_ENV === 'development' ? 'http' : 'https');
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+
+  try {
+    const response = await fetch(`${baseUrl}/api/admin/stats`, {
+      method: 'GET',
+      cache: 'no-store',
+      headers: {
+        cookie: headerStore.get('cookie') ?? '',
+      },
+    });
+
+    if (response.status === 403) {
+      return { forbidden: true } as const;
+    }
+
+    if (!response.ok) {
+      return { error: true } as const;
+    }
+
+    return {
+      error: false,
+      forbidden: false,
+      data: (await response.json()) as AdminDashboardData,
+    } as const;
+  } catch {
+    return { error: true } as const;
+  }
 }
 
 export default async function AdminPage() {
@@ -36,205 +91,161 @@ export default async function AdminPage() {
     redirect('/dashboard');
   }
 
-  await dbConnect();
+  const result = await getAdminDashboardData();
 
-  const [
-    users,
-    orgCount,
-    assessmentCount,
-    interviewCount,
-    securityCheckCount,
-    caseStudyCount,
-    userCount,
-  ] = await Promise.all([
-    User.find().sort({ createdAt: -1 }).lean(),
-    Organization.countDocuments(),
-    Assessment.countDocuments(),
-    Interview.countDocuments(),
-    SecurityCheck.countDocuments(),
-    CaseStudy.countDocuments(),
-    User.countDocuments(),
-  ]);
+  if ('forbidden' in result && result.forbidden) {
+    redirect('/dashboard');
+  }
 
-  const systemStats = [
-    { label: 'Users', count: userCount, tone: 'from-fuchsia-500 to-pink-400' },
-    {
-      label: 'Organizations',
-      count: orgCount,
-      tone: 'from-sky-500 to-cyan-400',
-    },
-    {
-      label: 'Assessments',
-      count: assessmentCount,
-      tone: 'from-emerald-500 to-teal-400',
-    },
-    {
-      label: 'Interviews',
-      count: interviewCount,
-      tone: 'from-violet-500 to-purple-400',
-    },
-    {
-      label: 'Security Checks',
-      count: securityCheckCount,
-      tone: 'from-amber-500 to-orange-400',
-    },
-    {
-      label: 'Case Studies',
-      count: caseStudyCount,
-      tone: 'from-rose-500 to-red-400',
-    },
-  ];
+  if ('error' in result && result.error) {
+    return (
+      <div className='flex min-h-screen flex-col items-center justify-center rounded-3xl bg-[#0F1117] px-6 text-center'>
+        <ShieldAlert className='h-12 w-12 text-red-500' />
+        <h1 className='mt-4 text-2xl font-semibold text-slate-100'>
+          Failed to load admin data
+        </h1>
+        <p className='mt-2 text-slate-400'>
+          There was a problem fetching system data.
+        </p>
+        <a
+          href='/admin'
+          className='mt-6 rounded-lg bg-slate-800 px-6 py-2 text-slate-100 transition hover:bg-slate-700'>
+          Retry
+        </a>
+      </div>
+    );
+  }
 
-  // Build recent activity from all models (last 50)
-  const [recentAssessments, recentInterviews, recentOrgs, recentUsers] =
-    await Promise.all([
-      Assessment.find()
-        .populate('orgId', 'name')
-        .sort({ createdAt: -1 })
-        .limit(15)
-        .lean(),
-      Interview.find()
-        .populate('orgId', 'name')
-        .sort({ date: -1 })
-        .limit(15)
-        .lean(),
-      Organization.find().sort({ createdAt: -1 }).limit(10).lean(),
-      User.find().sort({ createdAt: -1 }).limit(10).lean(),
-    ]);
-
-  const auditLog: RecentAction[] = [
-    ...recentAssessments.map((a) => ({
-      id: a._id.toString(),
-      type: 'Assessment',
-      label: `Assessment scored ${a.overallScore.toFixed(1)} for ${a.orgId?.name || 'Unknown'}`,
-      date: a.createdAt.toISOString(),
-    })),
-    ...recentInterviews.map((i) => ({
-      id: i._id.toString(),
-      type: 'Interview',
-      label: `${i.intervieweeName} interviewed at ${i.orgId?.name || 'Unknown'}`,
-      date: i.date.toISOString(),
-    })),
-    ...recentOrgs.map((o) => ({
-      id: o._id.toString(),
-      type: 'Organization',
-      label: `${o.name} created`,
-      date: o.createdAt.toISOString(),
-    })),
-    ...recentUsers.map((u) => ({
-      id: u._id.toString(),
-      type: 'User',
-      label: `${u.name} (${u.email}) registered`,
-      date: u.createdAt.toISOString(),
-    })),
-  ]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 50);
-
-  const typeBadge: Record<string, string> = {
-    Assessment:
-      'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
-    Interview: 'bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300',
-    Organization:
-      'bg-violet-50 text-violet-700 dark:bg-violet-950 dark:text-violet-300',
-    User: 'bg-fuchsia-50 text-fuchsia-700 dark:bg-fuchsia-950 dark:text-fuchsia-300',
-  };
+  const data = result.data;
 
   return (
-    <div className='space-y-8'>
-      <PageHeader
-        title='Admin Panel'
-        description='Manage users, view system statistics, and review activity.'
+    <div className='space-y-6 rounded-3xl bg-[#0F1117] p-6'>
+      <div className='flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'>
+        <div className='space-y-3'>
+          <p className='text-sm text-slate-500'>Dashboard / Admin Console</p>
+          <div className='flex flex-wrap items-center gap-3'>
+            <h1 className='text-3xl font-semibold text-slate-100'>
+              Admin Console
+            </h1>
+            <span className='rounded-full border border-red-700 bg-red-900/60 px-2.5 py-1 text-xs font-semibold text-red-300'>
+              ADMIN
+            </span>
+          </div>
+          <p className='text-sm text-slate-400'>
+            Platform-wide analytics, user management, and system oversight
+          </p>
+          <div className='inline-flex rounded-md bg-slate-800 px-2 py-1 text-xs text-slate-500'>
+            Last updated:{' '}
+            {new Intl.DateTimeFormat('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+            }).format(new Date(data.generatedAt))}
+          </div>
+        </div>
+        <AdminDashboardActions data={data} />
+      </div>
+
+      {data.criticalAlerts > 0 ? (
+        <div className='rounded-lg border border-red-700 bg-red-950/40 p-3 text-red-300'>
+          ⚠ {data.criticalAlerts.toLocaleString()} critical alerts require your
+          attention
+        </div>
+      ) : null}
+
+      <AdminStatsCardGrid data={data} />
+
+      <div className='border-t border-slate-800 my-2' />
+      <SectionHeader
+        title='User & Access Analytics'
+        subtitle='Registration, role distribution, and platform access patterns.'
       />
+      <div className='grid gap-6 xl:grid-cols-3'>
+        <div className='xl:col-span-2'>
+          <UserGrowthChart data={data.userGrowthTrend} />
+        </div>
+        <UsersByRoleChart
+          data={data.usersByRole}
+          totalUsers={data.totalUsers}
+        />
+      </div>
 
-      {/* System Stats */}
-      <section className='grid gap-4 md:grid-cols-3 xl:grid-cols-6'>
-        {systemStats.map((stat) => (
-          <Card
-            key={stat.label}
-            className='overflow-hidden'>
-            <CardContent className='p-0'>
-              <div className={`h-1.5 bg-linear-to-r ${stat.tone}`} />
-              <div className='space-y-1 p-4'>
-                <p className='text-xs font-medium text-slate-500 dark:text-slate-400'>
-                  {stat.label}
-                </p>
-                <p className='text-2xl font-semibold text-slate-900 dark:text-slate-50'>
-                  {stat.count}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </section>
+      <div className='border-t border-slate-800 my-2' />
+      <SectionHeader
+        title='Audit & Security Events'
+        subtitle='Operational security signals and high-level audit activity.'
+      />
+      <div className='grid gap-6 xl:grid-cols-2'>
+        <AuditEventsTrendChart data={data.auditTrend} />
+        <AuditEventsByTypeChart data={data.auditEventsByType} />
+      </div>
 
-      {/* User Management */}
-      <AdminUserList
-        users={users.map((u) => ({
-          id: u._id.toString(),
-          name: u.name,
-          email: u.email,
-          role: u.role as 'admin' | 'viewer',
-          provider: u.provider,
-          createdAt: u.createdAt.toISOString(),
-        }))}
+      <div className='border-t border-slate-800 my-2' />
+      <SectionHeader
+        title='System Health'
+        subtitle='API reliability, database status, and live session footprint.'
+      />
+      <div className='grid gap-6 xl:grid-cols-2'>
+        <SystemErrorTrendChart data={data.systemErrorTrend} />
+        <SystemHealthCard data={data.systemHealth} />
+      </div>
+
+      <div className='border-t border-slate-800 my-2' />
+      <SectionHeader
+        title='Billing & Subscriptions'
+        subtitle='Recurring revenue, plan mix, and subscription health.'
+      />
+      <div className='grid gap-6 xl:grid-cols-2'>
+        <RevenueTrendChart data={data.revenueTrend} />
+        <SubscriptionBreakdownChart
+          data={data.subscriptionBreakdown}
+          totalMonthlyRevenue={data.totalMonthlyRevenue}
+        />
+      </div>
+
+      <div className='border-t border-slate-800 my-2' />
+      <SectionHeader
+        title='Cross-Platform Assessment Analytics'
+        subtitle='Readiness, industry, and security performance across all organizations.'
+      />
+      <div className='grid gap-6 xl:grid-cols-3'>
+        <div className='xl:col-span-2'>
+          <AssessmentScoresByIndustry data={data.scoresByIndustry} />
+        </div>
+        <RiskDistributionChart data={data.riskDistribution} />
+      </div>
+      <div className='grid gap-6 xl:grid-cols-2'>
+        <CategoryRadarChart data={data.categoryAverages} />
+        <SecurityComplianceHeatmap
+          data={data.securityCategoryBreakdown}
+        />
+      </div>
+
+      <div className='border-t border-slate-800 my-2' />
+      <SectionHeader
+        title='User Management'
+        subtitle='Administrative role, status, and access review.'
+      />
+      <UserManagementTable
+        users={data.topUsers}
         currentUserId={session.user.id}
       />
 
-      {/* Audit Log */}
-      <Card>
-        <CardHeader>
-          <h2 className='text-xl font-semibold text-slate-900 dark:text-slate-50'>
-            Activity log
-          </h2>
-          <p className='text-sm text-slate-500 dark:text-slate-400'>
-            Last 50 actions across the platform
-          </p>
-        </CardHeader>
-        <CardContent className='overflow-x-auto'>
-          <table className='min-w-full divide-y divide-slate-200 dark:divide-slate-800'>
-            <thead className='bg-slate-50 dark:bg-slate-950'>
-              <tr className='text-left text-xs uppercase tracking-widest text-slate-500'>
-                <th className='px-4 py-3'>Type</th>
-                <th className='px-4 py-3'>Action</th>
-                <th className='px-4 py-3'>Date</th>
-              </tr>
-            </thead>
-            <tbody className='divide-y divide-slate-100 text-sm dark:divide-slate-800'>
-              {auditLog.map((action, index) => (
-                <tr key={`${action.type}-${action.id}-${index}`}>
-                  <td className='px-4 py-3'>
-                    <Badge
-                      className={`text-xs ${typeBadge[action.type] ?? ''}`}>
-                      {action.type}
-                    </Badge>
-                  </td>
-                  <td className='px-4 py-3 text-slate-700 dark:text-slate-200'>
-                    {action.label}
-                  </td>
-                  <td className='px-4 py-3 text-slate-500'>
-                    {new Intl.DateTimeFormat('en-IN', {
-                      dateStyle: 'medium',
-                      timeStyle: 'short',
-                    }).format(new Date(action.date))}
-                  </td>
-                </tr>
-              ))}
-              {!auditLog.length ? (
-                <tr>
-                  <td colSpan={3} className='p-0'>
-                    <EmptyState
-                      icon={<Activity className="h-8 w-8" />}
-                      title="No activity"
-                      description="No activity recorded yet."
-                    />
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+      <div className='grid gap-6 xl:grid-cols-3'>
+        <div className='xl:col-span-2'>
+          <TopOrganizationsOverview data={data.topOrganizationsByActivity} />
+        </div>
+        <InactiveOrgsPanel data={data.inactiveOrganizations} />
+      </div>
+
+      <div className='grid gap-6 xl:grid-cols-3'>
+        <div className='xl:col-span-2'>
+          <AuditLogFeed data={data.recentAuditLogs} />
+        </div>
+        <RecentActivityFeed data={data.recentActivity} />
+      </div>
     </div>
   );
 }

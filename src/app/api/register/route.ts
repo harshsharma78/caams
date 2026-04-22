@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
+import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { registerSchema } from '@/lib/validations';
 import User from '@/models/User';
 
@@ -48,6 +49,8 @@ export async function POST(request: Request) {
       email: parsed.data.email.toLowerCase(),
       password: hashedPassword,
     });
+
+    clearAllStatsCaches();
 
     return NextResponse.json(
       {

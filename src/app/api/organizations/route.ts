@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageOrganizations } from '@/lib/permissions';
+import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { organizationSchema } from '@/lib/validations';
 import Assessment from '@/models/Assessment';
 import Organization from '@/models/Organization';
@@ -92,6 +93,8 @@ export async function POST(request: Request) {
       email: parsed.data.email.toLowerCase(),
       createdBy: session.user.id,
     });
+
+    clearAllStatsCaches();
 
     return NextResponse.json(
       {

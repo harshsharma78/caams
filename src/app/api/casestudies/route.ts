@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageOrganizations } from '@/lib/permissions';
+import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { caseStudySchema } from '@/lib/validations';
 import CaseStudy from '@/models/CaseStudy';
 
@@ -114,6 +115,8 @@ export async function POST(request: Request) {
       ...parsed.data,
       uploadedBy: session.user.id,
     });
+
+    clearAllStatsCaches();
 
     return NextResponse.json(
       {

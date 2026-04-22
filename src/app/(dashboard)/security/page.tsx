@@ -3,6 +3,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { SecurityAssessmentList } from '@/components/security/SecurityAssessmentList';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
+import { canManageOrganizations } from '@/lib/permissions';
 import SecurityCheck from '@/models/SecurityCheck';
 
 export const metadata: Metadata = {
@@ -15,6 +16,8 @@ export default async function SecurityPage() {
   if (!session?.user) {
     return null;
   }
+
+  const canManage = canManageOrganizations(session.user.role);
 
   await dbConnect();
 
@@ -29,10 +32,11 @@ export default async function SecurityPage() {
       <PageHeader
         title='Security Assessments'
         description='Track cloud security posture by organization, review risk levels, and prioritize remediation work.'
-        actionHref='/security/new'
-        actionLabel='New assessment'
+        actionHref={canManage ? '/security/new' : undefined}
+        actionLabel={canManage ? 'New assessment' : undefined}
       />
       <SecurityAssessmentList
+        canManage={canManage}
         assessments={assessments
           .filter(
             (assessment) =>
