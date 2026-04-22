@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
+import { clearAllStatsCaches } from '@/lib/stats-cache';
 import {
   calculateSecurityScore,
   generateSecurityActionItems,
@@ -173,6 +174,8 @@ export async function PUT(
       );
     }
 
+    clearAllStatsCaches();
+
     return NextResponse.json({
       message: 'Security assessment updated successfully.',
       securityAssessment: { id: securityCheck._id.toString() },
@@ -220,6 +223,8 @@ export async function DELETE(
         { status: 404 },
       );
     }
+
+    clearAllStatsCaches();
 
     return NextResponse.json({
       message: 'Security assessment deleted successfully.',

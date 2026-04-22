@@ -2,12 +2,14 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { DeleteCaseStudyButton } from '@/components/casestudies/DeleteCaseStudyButton';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
+import { canManageOrganizations } from '@/lib/permissions';
 import CaseStudy from '@/models/CaseStudy';
 
 export const metadata: Metadata = {
@@ -25,6 +27,8 @@ export default async function CaseStudyDetailPage({
   if (!session?.user) {
     notFound();
   }
+
+  const canManage = canManageOrganizations(session.user.role);
 
   await dbConnect();
 
@@ -56,16 +60,33 @@ export default async function CaseStudyDetailPage({
         title={caseStudy.title}
         description={`${caseStudy.organization} · ${caseStudy.sector}`}
         action={
-          caseStudy.fileUrl ? (
-            <Button asChild>
-              <a
-                href={caseStudy.fileUrl}
-                target='_blank'
-                rel='noreferrer'>
-                Download PDF
-              </a>
-            </Button>
-          ) : null
+          <div className='flex flex-wrap items-center gap-3'>
+            {canManage ? (
+              <>
+                <Button
+                  asChild
+                  variant='outline'>
+                  <Link href={`/casestudies/${caseStudy._id.toString()}/edit`}>
+                    Edit case study
+                  </Link>
+                </Button>
+                <DeleteCaseStudyButton
+                  id={caseStudy._id.toString()}
+                  title={caseStudy.title}
+                />
+              </>
+            ) : null}
+            {caseStudy.fileUrl ? (
+              <Button asChild>
+                <a
+                  href={caseStudy.fileUrl}
+                  target='_blank'
+                  rel='noreferrer'>
+                  Download PDF
+                </a>
+              </Button>
+            ) : null}
+          </div>
         }
       />
 

@@ -6,6 +6,7 @@ import {
 } from '@/lib/assessmentEngine';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
+import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { assessmentInputSchema, objectIdSchema } from '@/lib/validations';
 import Assessment from '@/models/Assessment';
 import Organization from '@/models/Organization';
@@ -135,6 +136,8 @@ export async function POST(request: Request) {
       recommendation: result.recommendation,
       status: result.interpretation.status,
     });
+
+    clearAllStatsCaches();
 
     return NextResponse.json(
       {

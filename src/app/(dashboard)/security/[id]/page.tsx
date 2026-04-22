@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { DeleteSecurityAssessmentButton } from '@/components/security/DeleteSecurityAssessmentButton';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import {
   generateSecurityActionItems,
@@ -12,6 +15,7 @@ import {
 import { cn } from '@/lib/utils';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
+import { canManageOrganizations } from '@/lib/permissions';
 import SecurityCheck from '@/models/SecurityCheck';
 import type { SecurityChecklistItem } from '@/types';
 
@@ -30,6 +34,8 @@ export default async function SecurityAssessmentDetailPage({
   if (!session?.user) {
     notFound();
   }
+
+  const canManage = canManageOrganizations(session.user.role);
 
   await dbConnect();
 
@@ -97,6 +103,23 @@ export default async function SecurityAssessmentDetailPage({
       <PageHeader
         title={assessment.orgId.name}
         description='Security assessment detail with category scoring, findings, and remediation guidance.'
+        action={
+          canManage ? (
+            <div className='flex flex-wrap items-center gap-3'>
+              <Button
+                asChild
+                variant='outline'>
+                <Link href={`/security/${assessment._id.toString()}/edit`}>
+                  Edit assessment
+                </Link>
+              </Button>
+              <DeleteSecurityAssessmentButton
+                id={assessment._id.toString()}
+                organizationName={assessment.orgId.name}
+              />
+            </div>
+          ) : undefined
+        }
       />
 
       <div className='grid gap-6 xl:grid-cols-[0.82fr_1.18fr]'>

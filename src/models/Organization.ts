@@ -15,6 +15,12 @@ const organizationSchema = new Schema(
     email: { type: String, required: true, lowercase: true, trim: true },
     phone: { type: String, required: true, trim: true },
     logoUrl: { type: String, default: '' },
+    status: {
+      type: String,
+      enum: ['active', 'inactive', 'suspended', 'trial'],
+      default: 'active',
+      required: true,
+    },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',

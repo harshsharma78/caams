@@ -3,6 +3,10 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canViewDashboard } from '@/lib/permissions';
+import {
+  getDashboardStatsCache,
+  setDashboardStatsCache,
+} from '@/lib/stats-cache';
 import Assessment from '@/models/Assessment';
 import CaseStudy from '@/models/CaseStudy';
 import Interview from '@/models/Interview';
@@ -16,13 +20,6 @@ import type {
 } from '@/types/dashboard';
 
 export const dynamic = 'force-dynamic';
-
-type CacheEntry = {
-  data: DashboardStatsResponse;
-  expiresAt: number;
-};
-
-let dashboardStatsCache: CacheEntry | null = null;
 
 const CACHE_TTL_MS = 60_000;
 
@@ -805,21 +802,20 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
     }
 
-    if (
-      dashboardStatsCache &&
-      dashboardStatsCache.expiresAt > Date.now()
-    ) {
-      return NextResponse.json(dashboardStatsCache.data);
+    const cached = getDashboardStatsCache();
+
+    if (cached && cached.expiresAt > Date.now()) {
+      return NextResponse.json(cached.data);
     }
 
     await dbConnect();
 
     const data = await buildDashboardStats();
 
-    dashboardStatsCache = {
+    setDashboardStatsCache({
       data,
       expiresAt: Date.now() + CACHE_TTL_MS,
-    };
+    });
 
     return NextResponse.json(data);
   } catch (error) {

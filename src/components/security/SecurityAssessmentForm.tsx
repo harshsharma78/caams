@@ -25,6 +25,12 @@ import type { SecurityChecklistItem } from '@/types';
 
 interface SecurityAssessmentFormProps {
   organizations: { id: string; name: string }[];
+  mode?: 'create' | 'edit';
+  assessmentId?: string;
+  initialValues?: {
+    orgId: string;
+    checklist: SecurityChecklistItem[];
+  };
 }
 
 const statusOptions: Array<{
@@ -38,10 +44,17 @@ const statusOptions: Array<{
 
 export function SecurityAssessmentForm({
   organizations,
+  mode = 'create',
+  assessmentId,
+  initialValues,
 }: SecurityAssessmentFormProps) {
   const router = useRouter();
-  const [orgId, setOrgId] = useState(organizations[0]?.id ?? '');
-  const [checklist, setChecklist] = useState(buildDefaultSecurityChecklist);
+  const [orgId, setOrgId] = useState(
+    initialValues?.orgId ?? organizations[0]?.id ?? '',
+  );
+  const [checklist, setChecklist] = useState(
+    initialValues?.checklist ?? buildDefaultSecurityChecklist,
+  );
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
@@ -228,11 +241,16 @@ export function SecurityAssessmentForm({
                 setError('');
 
                 startTransition(async () => {
-                  const response = await fetch('/api/security', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(parsed.data),
-                  });
+                  const response = await fetch(
+                    mode === 'edit' && assessmentId
+                      ? `/api/security/${assessmentId}`
+                      : '/api/security',
+                    {
+                      method: mode === 'edit' ? 'PUT' : 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(parsed.data),
+                    },
+                  );
 
                   const data = (await response.json()) as {
                     error?: string;
@@ -249,12 +267,22 @@ export function SecurityAssessmentForm({
                     return;
                   }
 
-                  toast.success('Security assessment saved successfully.');
+                  toast.success(
+                    mode === 'edit'
+                      ? 'Security assessment updated successfully.'
+                      : 'Security assessment saved successfully.',
+                  );
                   router.push(`/security/${data.securityAssessment.id}`);
                   router.refresh();
                 });
               }}>
-              {isPending ? 'Saving...' : 'Save assessment'}
+              {isPending
+                ? mode === 'edit'
+                  ? 'Updating...'
+                  : 'Saving...'
+                : mode === 'edit'
+                  ? 'Update assessment'
+                  : 'Save assessment'}
             </Button>
           </div>
         </CardContent>

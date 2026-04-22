@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'viewer';
+export type UserRole = 'admin' | 'analyst' | 'viewer' | 'org_manager';
 export type OrganizationSize = 'startup' | 'sme' | 'enterprise';
 export type AssessmentStatus =
   | 'not-ready'

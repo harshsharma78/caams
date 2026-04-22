@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
+import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { canManageOrganizations } from '@/lib/permissions';
 import {
   calculateSecurityScore,
@@ -151,6 +152,8 @@ export async function POST(request: Request) {
       recommendations,
       conductedBy: session.user.id,
     });
+
+    clearAllStatsCaches();
 
     return NextResponse.json(
       {

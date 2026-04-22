@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageInterviews } from '@/lib/permissions';
+import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { objectIdSchema } from '@/lib/validations';
 import Interview from '@/models/Interview';
 
@@ -127,6 +128,8 @@ export async function DELETE(
         { status: 404 },
       );
     }
+
+    clearAllStatsCaches();
 
     return NextResponse.json({ message: 'Interview deleted successfully.' });
   } catch (error) {

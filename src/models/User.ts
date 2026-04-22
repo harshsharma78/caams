@@ -27,9 +27,28 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'viewer'],
+      enum: ['admin', 'analyst', 'viewer', 'org_manager'],
       default: 'viewer',
       required: true,
+    },
+    status: {
+      type: String,
+      enum: ['active', 'pending', 'suspended'],
+      default: 'active',
+      required: true,
+    },
+    lastLoginAt: {
+      type: Date,
+      default: null,
+    },
+    activeSessionToken: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    sessionExpiresAt: {
+      type: Date,
+      default: null,
     },
   },
   {

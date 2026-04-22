@@ -3,6 +3,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { CaseStudyLibrary } from '@/components/casestudies/CaseStudyLibrary';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
+import { canManageOrganizations } from '@/lib/permissions';
 import CaseStudy from '@/models/CaseStudy';
 
 export const metadata: Metadata = {
@@ -16,6 +17,8 @@ export default async function CaseStudiesPage() {
     return null;
   }
 
+  const canManage = canManageOrganizations(session.user.role);
+
   await dbConnect();
 
   const caseStudies = await CaseStudy.find({})
@@ -28,10 +31,11 @@ export default async function CaseStudiesPage() {
       <PageHeader
         title='Case Study Library'
         description='Search sector-specific cloud adoption examples, compare outcomes, and keep supporting documents close to assessment work.'
-        actionHref='/casestudies/new'
-        actionLabel='New case study'
+        actionHref={canManage ? '/casestudies/new' : undefined}
+        actionLabel={canManage ? 'New case study' : undefined}
       />
       <CaseStudyLibrary
+        canManage={canManage}
         caseStudies={caseStudies.map((caseStudy) => ({
           id: caseStudy._id.toString(),
           title: caseStudy.title,
