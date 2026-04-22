@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -13,6 +14,10 @@ import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import SecurityCheck from '@/models/SecurityCheck';
 import type { SecurityChecklistItem } from '@/types';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Security Assessment Details',
+};
 
 export default async function SecurityAssessmentDetailPage({
   params,

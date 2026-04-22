@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' });
@@ -27,7 +27,7 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider>
             {children}
-            <Toaster />
+            <Toaster position="top-right" />
           </ThemeProvider>
         </AuthProvider>
       </body>

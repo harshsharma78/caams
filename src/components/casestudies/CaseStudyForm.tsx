@@ -3,6 +3,8 @@
 import { useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
+import toast from 'react-hot-toast';
+
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Input, Textarea } from '@/components/ui/Input';
@@ -190,9 +192,11 @@ export function CaseStudyForm() {
 
               if (!response.ok || !data.caseStudy?.id) {
                 setError(data.error ?? 'Unable to save case study.');
+                toast.error(data.error ?? 'Unable to save case study.');
                 return;
               }
 
+              toast.success('Case study saved successfully.');
               router.push(`/casestudies/${data.caseStudy.id}`);
               router.refresh();
             });

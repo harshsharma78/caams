@@ -1,8 +1,13 @@
+import type { Metadata } from 'next';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { CaseStudyLibrary } from '@/components/casestudies/CaseStudyLibrary';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import CaseStudy from '@/models/CaseStudy';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Case Studies',
+};
 
 export default async function CaseStudiesPage() {
   const session = await auth();

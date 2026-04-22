@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { useToast } from '@/hooks/use-toast';
+import toast from 'react-hot-toast';
 import { loginSchema } from '@/lib/validations';
 
 type LoginValues = z.infer<typeof loginSchema>;
@@ -27,7 +27,6 @@ export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';
-  const { toast } = useToast();
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -47,18 +46,11 @@ export function LoginForm() {
     });
 
     if (result?.error) {
-      toast({
-        title: 'Login failed',
-        description: 'Incorrect email or password.',
-        variant: 'destructive',
-      });
+      toast.error('Incorrect email or password.');
       return;
     }
 
-    toast({
-      title: 'Signed in',
-      description: 'Welcome back to the CAAMS workspace.',
-    });
+    toast.success('Signed in successfully.');
 
     router.replace(callbackUrl);
     router.refresh();

@@ -1,9 +1,14 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { OrganizationForm } from '@/components/forms/OrganizationForm';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { auth } from '@/lib/auth';
 import { canManageOrganizations } from '@/lib/permissions';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | New Organization',
+};
 
 export default async function NewOrganizationPage() {
   const session = await auth();

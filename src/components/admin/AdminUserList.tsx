@@ -11,7 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import { Users } from 'lucide-react';
+import toast from 'react-hot-toast';
+
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface UserItem {
   id: string;
@@ -30,7 +33,6 @@ interface AdminUserListProps {
 export function AdminUserList({ users, currentUserId }: AdminUserListProps) {
   const [userList, setUserList] = useState(users);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     if (newRole !== 'admin' && newRole !== 'viewer') return;
@@ -47,11 +49,7 @@ export function AdminUserList({ users, currentUserId }: AdminUserListProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        toast({
-          title: 'Update failed',
-          description: data.error ?? 'Unable to update role.',
-          variant: 'destructive',
-        });
+        toast.error(data.error ?? 'Unable to update role.');
         return;
       }
 
@@ -61,16 +59,9 @@ export function AdminUserList({ users, currentUserId }: AdminUserListProps) {
         ),
       );
 
-      toast({
-        title: 'Role updated',
-        description: `${data.user?.name ?? 'User'} is now ${newRole}.`,
-      });
+      toast.success(`${data.user?.name ?? 'User'} is now ${newRole}.`);
     } catch {
-      toast({
-        title: 'Error',
-        description: 'An unexpected error occurred.',
-        variant: 'destructive',
-      });
+      toast.error('An unexpected error occurred.');
     } finally {
       setUpdatingId(null);
     }
@@ -154,6 +145,17 @@ export function AdminUserList({ users, currentUserId }: AdminUserListProps) {
                 </tr>
               );
             })}
+            {userList.length === 0 && (
+              <tr>
+                <td colSpan={6} className='p-0'>
+                  <EmptyState
+                    icon={<Users className="h-8 w-8" />}
+                    title="No users found"
+                    description="There are currently no users in the system."
+                  />
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </CardContent>

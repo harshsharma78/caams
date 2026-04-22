@@ -3,9 +3,12 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
+import { BookOpen, Search } from 'lucide-react';
+
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { Input } from '@/components/ui/Input';
 import {
   Select,
@@ -135,11 +138,26 @@ export function CaseStudyLibrary({ caseStudies }: CaseStudyLibraryProps) {
       </div>
 
       {!filteredCaseStudies.length ? (
-        <Card>
-          <CardContent className='py-14 text-center text-sm text-slate-500 dark:text-slate-400'>
-            No case studies match the current search and filter combination.
-          </CardContent>
-        </Card>
+        caseStudies.length === 0 ? (
+          <EmptyState
+            icon={<BookOpen className="h-8 w-8" />}
+            title="No case studies"
+            description="Get started by creating your first case study."
+            actionLabel="Add your first Case Study"
+            actionHref="/casestudies/new"
+          />
+        ) : (
+          <EmptyState
+            icon={<Search className="h-8 w-8" />}
+            title="No matches found"
+            description="No case studies match the current search and filter combination."
+            actionLabel="Clear filters"
+            onAction={() => {
+              setSearch('');
+              setSector('all');
+            }}
+          />
+        )
       ) : null}
     </div>
   );

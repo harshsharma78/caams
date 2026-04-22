@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { InterviewForm } from '@/components/forms/InterviewForm';
@@ -6,6 +7,10 @@ import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageInterviews } from '@/lib/permissions';
 import Organization from '@/models/Organization';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | New Interview',
+};
 
 export default async function NewInterviewPage() {
   const session = await auth();

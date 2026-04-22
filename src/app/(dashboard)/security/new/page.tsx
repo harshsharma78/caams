@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -9,6 +10,10 @@ import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageOrganizations } from '@/lib/permissions';
 import Organization from '@/models/Organization';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | New Security Assessment',
+};
 
 export default async function NewSecurityAssessmentPage() {
   const session = await auth();

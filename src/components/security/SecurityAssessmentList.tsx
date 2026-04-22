@@ -3,9 +3,12 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
+import { Search, ShieldAlert } from 'lucide-react';
+
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { Input } from '@/components/ui/Input';
 import {
   Select,
@@ -119,11 +122,26 @@ export function SecurityAssessmentList({
       </div>
 
       {!filteredAssessments.length ? (
-        <Card>
-          <CardContent className='py-14 text-center text-sm text-slate-500 dark:text-slate-400'>
-            No security assessments match the current filters.
-          </CardContent>
-        </Card>
+        assessments.length === 0 ? (
+          <EmptyState
+            icon={<ShieldAlert className="h-8 w-8" />}
+            title="No security assessments"
+            description="Start evaluating the security posture of your organizations."
+            actionLabel="Add security check"
+            actionHref="/security/new"
+          />
+        ) : (
+          <EmptyState
+            icon={<Search className="h-8 w-8" />}
+            title="No matches found"
+            description="No security assessments match the current filters."
+            actionLabel="Clear filters"
+            onAction={() => {
+              setSearch('');
+              setRiskFilter('all');
+            }}
+          />
+        )
       ) : null}
     </div>
   );

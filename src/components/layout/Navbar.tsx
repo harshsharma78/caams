@@ -12,7 +12,7 @@ export function Navbar({ user, onMenuClick }: NavbarProps) {
     <header className='sticky top-0 z-20 flex items-center justify-between border-b border-slate-200 bg-white/90 px-4 py-4 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90 md:px-6'>
       <div className='flex items-center gap-3'>
         <button
-          className='inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 lg:hidden'
+          className='inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 md:hidden'
           onClick={onMenuClick}
           aria-label='Open navigation'>
           ☰

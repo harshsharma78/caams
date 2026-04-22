@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -122,9 +123,11 @@ export function InterviewForm({ organizations }: InterviewFormProps) {
 
           if (!response.ok) {
             setError(data.error ?? 'Unable to save interview.');
+            toast.error(data.error ?? 'Unable to save interview.');
             return;
           }
 
+          toast.success('Interview saved successfully.');
           const targetId = data.interview?.id;
           router.push(targetId ? `/interviews/${targetId}` : '/interviews');
           router.refresh();

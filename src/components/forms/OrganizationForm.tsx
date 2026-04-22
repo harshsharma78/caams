@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
+import toast from 'react-hot-toast';
+
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -111,9 +113,11 @@ export function OrganizationForm({
 
               if (!response.ok) {
                 setError(data.error ?? 'Unable to save organization.');
+                toast.error(data.error ?? 'Unable to save organization.');
                 return;
               }
 
+              toast.success(`Organization ${mode === 'create' ? 'created' : 'updated'} successfully.`);
               const targetId = data.organization?.id ?? organizationId;
               router.push(
                 targetId ? `/organizations/${targetId}` : '/organizations',

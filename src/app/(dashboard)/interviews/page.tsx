@@ -1,14 +1,22 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+
+import { Users } from 'lucide-react';
 
 import { InterviewFilters } from '@/components/forms/InterviewFilters';
 import { DeleteInterviewButton } from '@/components/forms/DeleteInterviewButton';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent } from '@/components/ui/Card';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageInterviews } from '@/lib/permissions';
 import Interview from '@/models/Interview';
 import Organization from '@/models/Organization';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Interviews',
+};
 
 interface InterviewsPageProps {
   searchParams: Promise<{
@@ -160,11 +168,14 @@ export default async function InterviewsPage({
                   })
                 ) : (
                   <tr>
-                    <td
-                      className='px-6 py-12 text-center text-sm text-slate-500 dark:text-slate-400'
-                      colSpan={6}>
-                      No interviews found. Adjust your filters or record a new
-                      interview.
+                    <td colSpan={6} className='p-0'>
+                      <EmptyState
+                        icon={<Users className="h-8 w-8" />}
+                        title="No interviews"
+                        description="Record cloud computing experience interviews."
+                        actionLabel={canManage ? "New interview" : undefined}
+                        actionHref={canManage ? "/interviews/new" : undefined}
+                      />
                     </td>
                   </tr>
                 )}

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { DeleteOrganizationButton } from '@/components/forms/DeleteOrganizationButton';
@@ -9,6 +10,10 @@ import { dbConnect } from '@/lib/db';
 import { canManageOrganizations } from '@/lib/permissions';
 import Assessment from '@/models/Assessment';
 import Organization from '@/models/Organization';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Organizations',
+};
 
 export default async function OrganizationsPage() {
   const session = await auth();

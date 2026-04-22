@@ -1,9 +1,13 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+import { Activity } from 'lucide-react';
 
 import { AdminUserList } from '@/components/admin/AdminUserList';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { isAdmin } from '@/lib/permissions';
@@ -13,6 +17,10 @@ import Interview from '@/models/Interview';
 import Organization from '@/models/Organization';
 import SecurityCheck from '@/models/SecurityCheck';
 import User from '@/models/User';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Admin',
+};
 
 interface RecentAction {
   id: string;
@@ -214,10 +222,12 @@ export default async function AdminPage() {
               ))}
               {!auditLog.length ? (
                 <tr>
-                  <td
-                    colSpan={3}
-                    className='px-4 py-12 text-center text-slate-500'>
-                    No activity recorded yet.
+                  <td colSpan={3} className='p-0'>
+                    <EmptyState
+                      icon={<Activity className="h-8 w-8" />}
+                      title="No activity"
+                      description="No activity recorded yet."
+                    />
                   </td>
                 </tr>
               ) : null}

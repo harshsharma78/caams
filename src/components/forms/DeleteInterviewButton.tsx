@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
+import toast from 'react-hot-toast';
 
 interface DeleteInterviewButtonProps {
   id: string;
@@ -35,8 +36,11 @@ export function DeleteInterviewButton({
           });
 
           if (response.ok) {
+            toast.success('Interview deleted successfully.');
             router.push('/interviews');
             router.refresh();
+          } else {
+            toast.error('Unable to delete interview.');
           }
         });
       }}>

@@ -3,8 +3,11 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
+import { Search, Target } from 'lucide-react';
+
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { Input } from '@/components/ui/Input';
 import {
   Select,
@@ -154,10 +157,28 @@ export function AssessmentList({
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className='px-6 py-12 text-center text-sm text-slate-500 dark:text-slate-400'>
-                    No assessments match the current filters.
+                  <td colSpan={5} className='p-0'>
+                    {assessments.length === 0 ? (
+                      <EmptyState
+                        icon={<Target className="h-8 w-8" />}
+                        title="No assessments"
+                        description="Start evaluating cloud readiness for your organizations."
+                        actionLabel="Add assessment"
+                        actionHref="/assessments/new"
+                      />
+                    ) : (
+                      <EmptyState
+                        icon={<Search className="h-8 w-8" />}
+                        title="No matches found"
+                        description="No assessments match the current filters."
+                        actionLabel="Clear filters"
+                        onAction={() => {
+                          setOrganizationId('all');
+                          setMinScore('');
+                          setMaxScore('');
+                        }}
+                      />
+                    )}
                   </td>
                 </tr>
               )}

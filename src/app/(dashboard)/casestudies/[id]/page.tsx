@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -8,6 +9,10 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import CaseStudy from '@/models/CaseStudy';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Case Study Details',
+};
 
 export default async function CaseStudyDetailPage({
   params,

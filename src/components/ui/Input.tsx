@@ -32,6 +32,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <label className='block space-y-1.5'>
         <span className='text-sm font-medium text-slate-700 dark:text-slate-200'>
           {label}
+          {props.required && <span className="ml-1 text-rose-500">*</span>}
         </span>
         {control}
         {error ? <p className='text-sm text-rose-600'>{error}</p> : null}
@@ -65,6 +66,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       <label className='block space-y-1.5'>
         <span className='text-sm font-medium text-slate-700 dark:text-slate-200'>
           {label}
+          {props.required && <span className="ml-1 text-rose-500">*</span>}
         </span>
         {control}
         {error ? <p className='text-sm text-rose-600'>{error}</p> : null}

@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
@@ -242,9 +243,13 @@ export function SecurityAssessmentForm({
                     setError(
                       data.error ?? 'Unable to save security assessment.',
                     );
+                    toast.error(
+                      data.error ?? 'Unable to save security assessment.',
+                    );
                     return;
                   }
 
+                  toast.success('Security assessment saved successfully.');
                   router.push(`/security/${data.securityAssessment.id}`);
                   router.refresh();
                 });

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -10,6 +11,10 @@ import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageInterviews } from '@/lib/permissions';
 import Interview from '@/models/Interview';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Interview Details',
+};
 
 export default async function InterviewDetailPage({
   params,
