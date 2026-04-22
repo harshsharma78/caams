@@ -87,6 +87,29 @@ body {
   color: hsl(var(--foreground));
 }
 
+@media print {
+  aside,
+  header,
+  [data-dashboard-actions] {
+    display: none !important;
+  }
+
+  body,
+  main {
+    background: white !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  .rounded-2xl,
+  .shadow-sm,
+  .shadow-md {
+    box-shadow: none !important;
+  }
+}
+
 @layer utilities {
   .no-spinner::-webkit-inner-spin-button,
   .no-spinner::-webkit-outer-spin-button {
