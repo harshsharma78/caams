@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { AssessmentList } from '@/components/assessments/AssessmentList';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { getScoreInterpretation } from '@/lib/assessmentEngine';
@@ -5,6 +6,10 @@ import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import Assessment from '@/models/Assessment';
 import Organization from '@/models/Organization';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Assessments',
+};
 
 export default async function AssessmentsPage() {
   const session = await auth();

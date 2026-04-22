@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { AssessmentForm } from '@/components/assessments/AssessmentForm';
@@ -6,6 +7,10 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import Organization from '@/models/Organization';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | New Assessment',
+};
 
 export default async function NewAssessmentPage() {
   const session = await auth();

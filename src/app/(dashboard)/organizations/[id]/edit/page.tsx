@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { OrganizationForm } from '@/components/forms/OrganizationForm';
@@ -6,6 +7,10 @@ import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageOrganizations } from '@/lib/permissions';
 import Organization from '@/models/Organization';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Edit Organization',
+};
 
 export default async function EditOrganizationPage({
   params,

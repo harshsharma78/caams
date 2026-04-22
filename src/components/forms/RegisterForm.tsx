@@ -26,14 +26,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import toast from 'react-hot-toast';
 import { registerSchema } from '@/lib/validations';
 
 type RegisterValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
   const router = useRouter();
-  const { toast } = useToast();
 
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
@@ -59,18 +58,11 @@ export function RegisterForm() {
     };
 
     if (!response.ok) {
-      toast({
-        title: 'Registration failed',
-        description: data.error ?? 'Unable to create account.',
-        variant: 'destructive',
-      });
+      toast.error(data.error ?? 'Unable to create account.');
       return;
     }
 
-    toast({
-      title: 'Account created',
-      description: data.message ?? 'You can now sign in to CAAMS.',
-    });
+    toast.success(data.message ?? 'Account created. You can now sign in.');
 
     router.replace('/login?registered=1');
   };

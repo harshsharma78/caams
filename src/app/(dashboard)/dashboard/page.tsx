@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Card, CardContent } from '@/components/ui/Card';
 import { DashboardCharts } from '@/components/dashboard/DashboardCharts';
 import { dbConnect } from '@/lib/db';
@@ -5,6 +6,10 @@ import Assessment from '@/models/Assessment';
 import Interview from '@/models/Interview';
 import Organization from '@/models/Organization';
 import SecurityCheck from '@/models/SecurityCheck';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Dashboard',
+};
 
 interface RecentActivity {
   id: string;

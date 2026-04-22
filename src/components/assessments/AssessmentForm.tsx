@@ -8,6 +8,7 @@ import {
   calculateWeightedScores,
   getScoreInterpretation,
 } from '@/lib/assessmentEngine';
+import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Spinner } from '@/components/ui/Spinner';
@@ -279,9 +280,11 @@ export function AssessmentForm({ organizations }: AssessmentFormProps) {
 
                     if (!response.ok || !data.assessment?.id) {
                       setError(data.error ?? 'Unable to save assessment.');
+                      toast.error(data.error ?? 'Unable to save assessment.');
                       return;
                     }
 
+                    toast.success('Assessment saved successfully.');
                     router.push(`/assessments/${data.assessment.id}`);
                     router.refresh();
                   });

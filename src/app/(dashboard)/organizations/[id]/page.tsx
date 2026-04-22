@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -12,6 +13,10 @@ import { dbConnect } from '@/lib/db';
 import { canManageOrganizations } from '@/lib/permissions';
 import Assessment from '@/models/Assessment';
 import Organization from '@/models/Organization';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Organization Details',
+};
 
 export default async function OrganizationDetailPage({
   params,

@@ -1,9 +1,14 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { CaseStudyForm } from '@/components/casestudies/CaseStudyForm';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { auth } from '@/lib/auth';
 import { canManageOrganizations } from '@/lib/permissions';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | New Case Study',
+};
 
 export default async function NewCaseStudyPage() {
   const session = await auth();

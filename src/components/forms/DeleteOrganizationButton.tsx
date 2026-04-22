@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import toast from 'react-hot-toast';
 
 import { Modal } from '@/components/ui/Modal';
 
@@ -49,9 +50,11 @@ export function DeleteOrganizationButton({
 
             if (!response.ok) {
               setError(data.error ?? 'Unable to delete organization.');
+              toast.error(data.error ?? 'Unable to delete organization.');
               return;
             }
 
+            toast.success('Organization deleted successfully.');
             setOpen(false);
             router.push('/organizations');
             router.refresh();

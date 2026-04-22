@@ -1,8 +1,13 @@
+import type { Metadata } from 'next';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SecurityAssessmentList } from '@/components/security/SecurityAssessmentList';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import SecurityCheck from '@/models/SecurityCheck';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Security Assessments',
+};
 
 export default async function SecurityPage() {
   const session = await auth();

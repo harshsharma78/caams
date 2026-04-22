@@ -22,7 +22,7 @@ export function DashboardShell({
         role={user.role}
         onClose={() => setSidebarOpen(false)}
       />
-      <div className='lg:pl-72'>
+      <div className='md:pl-20 lg:pl-72 transition-all duration-300'>
         <Navbar
           user={user}
           onMenuClick={() => setSidebarOpen(true)}

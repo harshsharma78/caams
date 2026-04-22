@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { AssessmentActions } from '@/components/assessments/AssessmentActions';
@@ -9,6 +10,10 @@ import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import Assessment from '@/models/Assessment';
 import type { AssessmentCategoryScore } from '@/types';
+
+export const metadata: Metadata = {
+  title: 'CAAMS | Assessment Details',
+};
 
 export default async function AssessmentDetailPage({
   params,
