@@ -41,7 +41,7 @@ export function RegisterForm() {
       name: '',
       email: '',
       password: '',
-      role: 'viewer',
+      role: 'assessor',
     },
   });
 
@@ -158,14 +158,13 @@ export function RegisterForm() {
                         <SelectValue placeholder='Select a role' />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value='viewer'>Viewer</SelectItem>
+                        <SelectItem value='assessor'>Assessor</SelectItem>
                         <SelectItem value='admin'>Admin</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
                   <FormDescription className='text-slate-500'>
-                    New users default to viewer unless the first user or an
-                    existing admin assigns admin access.
+                    The selected role is applied to this account on sign-in.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

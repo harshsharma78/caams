@@ -1,7 +1,7 @@
 import type { UserRole } from '@/types';
 
 export function canViewDashboard(role?: UserRole | null) {
-  return role === 'admin' || role === 'viewer';
+  return role === 'admin' || role === 'assessor';
 }
 
 export function canManageOrganizations(role?: UserRole | null) {

@@ -21,7 +21,7 @@ import type { CaseStudyFormValues } from '@/types';
 
 const defaultValues: CaseStudyFormValues = {
   title: '',
-  organization: '',
+  orgId: '',
   sector: 'Technology',
   challenge: '',
   solution: '',
@@ -117,12 +117,14 @@ interface CaseStudyFormProps {
   mode?: 'create' | 'edit';
   caseStudyId?: string;
   initialValues?: CaseStudyFormValues;
+  organizations: { id: string; name: string }[];
 }
 
 export function CaseStudyForm({
   mode = 'create',
   caseStudyId,
   initialValues = defaultValues,
+  organizations,
 }: CaseStudyFormProps) {
   const router = useRouter();
   const [values, setValues] = useState<CaseStudyFormValues>(initialValues);
@@ -176,7 +178,7 @@ export function CaseStudyForm({
               const nextErrors = parsed.error.flatten().fieldErrors;
               setFieldErrors({
                 title: nextErrors.title?.[0],
-                organization: nextErrors.organization?.[0],
+                orgId: nextErrors.orgId?.[0],
                 sector: nextErrors.sector?.[0],
                 challenge: nextErrors.challenge?.[0],
                 solution: nextErrors.solution?.[0],
@@ -228,15 +230,28 @@ export function CaseStudyForm({
               placeholder='Cloud migration modernization for regulated workloads'
               error={fieldErrors.title}
             />
-            <Input
-              label='Organization'
-              value={values.organization}
-              onChange={(event) =>
-                handleChange('organization', event.target.value)
-              }
-              placeholder='Organization name'
-              error={fieldErrors.organization}
-            />
+            <label className='block space-y-1.5'>
+              <span className='text-sm font-medium text-slate-700 dark:text-slate-200'>
+                Organization
+              </span>
+              <Select
+                value={values.orgId}
+                onValueChange={(value) => handleChange('orgId', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder='Select organization' />
+                </SelectTrigger>
+                <SelectContent className='border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50'>
+                  {organizations.map((org) => (
+                    <SelectItem key={org.id} value={org.id}>
+                      {org.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {fieldErrors.orgId ? (
+                <p className='text-sm text-rose-600'>{fieldErrors.orgId}</p>
+              ) : null}
+            </label>
             <label className='block space-y-1.5'>
               <span className='text-sm font-medium text-slate-700 dark:text-slate-200'>
                 Sector

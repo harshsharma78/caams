@@ -22,6 +22,7 @@ export default async function CaseStudiesPage() {
   await dbConnect();
 
   const caseStudies = await CaseStudy.find({})
+    .populate('orgId', 'name')
     .populate('uploadedBy', 'name email role')
     .sort({ createdAt: -1 })
     .lean();
@@ -36,30 +37,42 @@ export default async function CaseStudiesPage() {
       />
       <CaseStudyLibrary
         canManage={canManage}
-        caseStudies={caseStudies.map((caseStudy) => ({
-          id: caseStudy._id.toString(),
-          title: caseStudy.title,
-          organization: caseStudy.organization,
-          sector: caseStudy.sector,
-          challenge: caseStudy.challenge,
-          solution: caseStudy.solution,
-          outcome: caseStudy.outcome,
-          results: caseStudy.results,
-          tags: caseStudy.tags,
-          fileUrl: caseStudy.fileUrl,
-          createdAt: caseStudy.createdAt.toISOString(),
-          uploadedBy:
-            caseStudy.uploadedBy &&
-            typeof caseStudy.uploadedBy === 'object' &&
-            '_id' in caseStudy.uploadedBy
-              ? {
-                  id: caseStudy.uploadedBy._id.toString(),
-                  name: caseStudy.uploadedBy.name,
-                  email: caseStudy.uploadedBy.email,
-                  role: caseStudy.uploadedBy.role,
-                }
-              : null,
-        }))}
+        caseStudies={caseStudies.map((caseStudy) => {
+          const hasOrg =
+            caseStudy.orgId &&
+            typeof caseStudy.orgId === 'object' &&
+            'name' in caseStudy.orgId;
+
+          return {
+            id: caseStudy._id.toString(),
+            title: caseStudy.title,
+            orgId: hasOrg
+              ? caseStudy.orgId._id.toString()
+              : caseStudy.orgId?.toString() ?? '',
+            organizationName: hasOrg
+              ? caseStudy.orgId.name
+              : 'Deleted Organization',
+            sector: caseStudy.sector,
+            challenge: caseStudy.challenge,
+            solution: caseStudy.solution,
+            outcome: caseStudy.outcome,
+            results: caseStudy.results,
+            tags: caseStudy.tags,
+            fileUrl: caseStudy.fileUrl,
+            createdAt: caseStudy.createdAt.toISOString(),
+            uploadedBy:
+              caseStudy.uploadedBy &&
+              typeof caseStudy.uploadedBy === 'object' &&
+              '_id' in caseStudy.uploadedBy
+                ? {
+                    id: caseStudy.uploadedBy._id.toString(),
+                    name: caseStudy.uploadedBy.name,
+                    email: caseStudy.uploadedBy.email,
+                    role: caseStudy.uploadedBy.role,
+                  }
+                : null,
+          };
+        })}
       />
     </div>
   );

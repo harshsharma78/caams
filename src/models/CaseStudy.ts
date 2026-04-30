@@ -3,7 +3,11 @@ import { InferSchemaType, Schema, model, models } from 'mongoose';
 const caseStudySchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
-    organization: { type: String, required: true, trim: true },
+    orgId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Organization',
+      required: true,
+    },
     sector: { type: String, required: true, trim: true },
     challenge: { type: String, required: true, trim: true },
     solution: { type: String, required: true, trim: true },

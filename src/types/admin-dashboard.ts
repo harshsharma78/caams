@@ -7,9 +7,7 @@ export type AdminRiskLevel =
   | 'unknown';
 export type AdminUserRole =
   | 'admin'
-  | 'analyst'
-  | 'viewer'
-  | 'org_manager';
+  | 'assessor';
 export type AdminUserStatus = 'active' | 'pending' | 'suspended';
 export type AdminOrganizationStatus =
   | 'active'

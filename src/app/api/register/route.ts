@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 
-import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { registerSchema } from '@/lib/validations';
@@ -23,9 +22,6 @@ export async function POST(request: Request) {
     }
 
     await dbConnect();
-    const session = await auth();
-    const userCount = await User.countDocuments();
-
     const existingUser = await User.findOne({
       email: parsed.data.email.toLowerCase(),
     }).lean();
@@ -38,16 +34,13 @@ export async function POST(request: Request) {
     }
 
     const hashedPassword = await bcrypt.hash(parsed.data.password, 12);
-    const role =
-      userCount === 0 || session?.user?.role === 'admin'
-        ? parsed.data.role
-        : 'viewer';
 
     const user = await User.create({
       ...parsed.data,
-      role,
+      role: parsed.data.role,
       email: parsed.data.email.toLowerCase(),
       password: hashedPassword,
+      provider: 'credentials',
     });
 
     clearAllStatsCaches();

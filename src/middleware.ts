@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
     // Role restriction
     if (
       pathname.startsWith('/organizations') &&
-      role === 'viewer' &&
+      role === 'assessor' &&
       (pathname.endsWith('/new') || pathname.endsWith('/edit'))
     ) {
       return NextResponse.redirect(new URL('/organizations', request.url));
@@ -54,7 +54,7 @@ export async function middleware(request: NextRequest) {
 
     if (
       pathname.startsWith('/interviews') &&
-      role === 'viewer' &&
+      role === 'assessor' &&
       pathname.endsWith('/new')
     ) {
       return NextResponse.redirect(new URL('/interviews', request.url));

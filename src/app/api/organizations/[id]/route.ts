@@ -6,7 +6,10 @@ import { canManageOrganizations } from '@/lib/permissions';
 import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { objectIdSchema, organizationSchema } from '@/lib/validations';
 import Assessment from '@/models/Assessment';
+import CaseStudy from '@/models/CaseStudy';
+import Interview from '@/models/Interview';
 import Organization from '@/models/Organization';
+import SecurityCheck from '@/models/SecurityCheck';
 
 /**
  * Returns one organization with its assessment count.
@@ -196,6 +199,14 @@ export async function DELETE(
         { status: 404 },
       );
     }
+
+    // Cascade delete all related records
+    await Promise.all([
+      Assessment.deleteMany({ orgId: parsedId.data }),
+      SecurityCheck.deleteMany({ orgId: parsedId.data }),
+      Interview.deleteMany({ orgId: parsedId.data }),
+      CaseStudy.deleteMany({ orgId: parsedId.data }),
+    ]);
 
     clearAllStatsCaches();
 

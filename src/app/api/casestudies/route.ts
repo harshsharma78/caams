@@ -6,6 +6,7 @@ import { canManageOrganizations } from '@/lib/permissions';
 import { clearAllStatsCaches } from '@/lib/stats-cache';
 import { caseStudySchema } from '@/lib/validations';
 import CaseStudy from '@/models/CaseStudy';
+import Organization from '@/models/Organization';
 
 export async function GET(request: Request) {
   try {
@@ -29,7 +30,6 @@ export async function GET(request: Request) {
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
-        { organization: { $regex: search, $options: 'i' } },
       ];
     }
 
@@ -41,6 +41,7 @@ export async function GET(request: Request) {
 
     const [caseStudies, total] = await Promise.all([
       CaseStudy.find(query)
+        .populate('orgId', 'name')
         .populate('uploadedBy', 'name email role')
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
@@ -50,30 +51,42 @@ export async function GET(request: Request) {
     ]);
 
     return NextResponse.json({
-      caseStudies: caseStudies.map((caseStudy) => ({
-        id: caseStudy._id.toString(),
-        title: caseStudy.title,
-        organization: caseStudy.organization,
-        sector: caseStudy.sector,
-        challenge: caseStudy.challenge,
-        solution: caseStudy.solution,
-        outcome: caseStudy.outcome,
-        results: caseStudy.results,
-        tags: caseStudy.tags,
-        fileUrl: caseStudy.fileUrl,
-        createdAt: caseStudy.createdAt.toISOString(),
-        uploadedBy:
-          caseStudy.uploadedBy &&
-          typeof caseStudy.uploadedBy === 'object' &&
-          '_id' in caseStudy.uploadedBy
-            ? {
-                id: caseStudy.uploadedBy._id.toString(),
-                name: caseStudy.uploadedBy.name,
-                email: caseStudy.uploadedBy.email,
-                role: caseStudy.uploadedBy.role,
-              }
-            : null,
-      })),
+      caseStudies: caseStudies.map((caseStudy) => {
+        const hasOrg =
+          caseStudy.orgId &&
+          typeof caseStudy.orgId === 'object' &&
+          'name' in caseStudy.orgId;
+
+        return {
+          id: caseStudy._id.toString(),
+          title: caseStudy.title,
+          orgId: hasOrg
+            ? caseStudy.orgId._id.toString()
+            : caseStudy.orgId?.toString() ?? '',
+          organizationName: hasOrg
+            ? caseStudy.orgId.name
+            : 'Deleted Organization',
+          sector: caseStudy.sector,
+          challenge: caseStudy.challenge,
+          solution: caseStudy.solution,
+          outcome: caseStudy.outcome,
+          results: caseStudy.results,
+          tags: caseStudy.tags,
+          fileUrl: caseStudy.fileUrl,
+          createdAt: caseStudy.createdAt.toISOString(),
+          uploadedBy:
+            caseStudy.uploadedBy &&
+            typeof caseStudy.uploadedBy === 'object' &&
+            '_id' in caseStudy.uploadedBy
+              ? {
+                  id: caseStudy.uploadedBy._id.toString(),
+                  name: caseStudy.uploadedBy.name,
+                  email: caseStudy.uploadedBy.email,
+                  role: caseStudy.uploadedBy.role,
+                }
+              : null,
+        };
+      }),
       pagination: {
         page,
         limit,
@@ -110,6 +123,15 @@ export async function POST(request: Request) {
     }
 
     await dbConnect();
+
+    const organization = await Organization.findById(parsed.data.orgId).lean();
+
+    if (!organization) {
+      return NextResponse.json(
+        { error: 'Organization not found.' },
+        { status: 404 },
+      );
+    }
 
     const caseStudy = await CaseStudy.create({
       ...parsed.data,

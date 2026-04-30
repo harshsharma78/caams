@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { isAdmin } from '@/lib/permissions';
-import { getAdminStatsCache, setAdminStatsCache } from '@/lib/stats-cache';
 import Assessment from '@/models/Assessment';
 import AuditLog from '@/models/AuditLog';
 import CaseStudy from '@/models/CaseStudy';
@@ -17,8 +16,6 @@ import User from '@/models/User';
 import type { AdminDashboardData } from '@/types/admin-dashboard';
 
 export const dynamic = 'force-dynamic';
-
-const CACHE_TTL_MS = 60_000;
 
 const assessmentCategoryOrder = [
   'Infrastructure Readiness',
@@ -920,7 +917,6 @@ async function buildAdminStats(): Promise<AdminDashboardData> {
     ),
     User.find({})
       .sort({ lastLoginAt: -1, createdAt: -1 })
-      .limit(10)
       .lean(),
     User.find({}).sort({ createdAt: -1 }).limit(5).lean(),
     Organization.find({}).sort({ createdAt: -1 }).limit(5).lean(),
@@ -1323,20 +1319,9 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
     }
 
-    const cached = getAdminStatsCache();
-
-    if (cached && cached.expiresAt > Date.now()) {
-      return NextResponse.json(cached.data);
-    }
-
     await dbConnect();
 
     const data = await buildAdminStats();
-
-    setAdminStatsCache({
-      data,
-      expiresAt: Date.now() + CACHE_TTL_MS,
-    });
 
     return NextResponse.json(data);
   } catch (error) {
