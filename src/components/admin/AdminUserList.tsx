@@ -20,7 +20,7 @@ interface UserItem {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'viewer';
+  role: 'admin' | 'assessor';
   provider: string;
   createdAt: string;
 }
@@ -35,7 +35,7 @@ export function AdminUserList({ users, currentUserId }: AdminUserListProps) {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
-    if (newRole !== 'admin' && newRole !== 'viewer') return;
+    if (newRole !== 'admin' && newRole !== 'assessor') return;
 
     setUpdatingId(userId);
 
@@ -55,7 +55,7 @@ export function AdminUserList({ users, currentUserId }: AdminUserListProps) {
 
       setUserList((current) =>
         current.map((u) =>
-          u.id === userId ? { ...u, role: newRole as 'admin' | 'viewer' } : u,
+          u.id === userId ? { ...u, role: newRole as 'admin' | 'assessor' } : u,
         ),
       );
 
@@ -70,7 +70,7 @@ export function AdminUserList({ users, currentUserId }: AdminUserListProps) {
   const roleBadge: Record<string, string> = {
     admin:
       'border border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-900 dark:bg-sky-950 dark:text-sky-300',
-    viewer:
+    assessor:
       'border border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300',
   };
 
@@ -136,7 +136,7 @@ export function AdminUserList({ users, currentUserId }: AdminUserListProps) {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className='border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50'>
-                          <SelectItem value='viewer'>Viewer</SelectItem>
+                          <SelectItem value='assessor'>Assessor</SelectItem>
                           <SelectItem value='admin'>Admin</SelectItem>
                         </SelectContent>
                       </Select>

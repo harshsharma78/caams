@@ -38,31 +38,36 @@ export default async function SecurityPage() {
       <SecurityAssessmentList
         canManage={canManage}
         assessments={assessments
-          .filter(
-            (assessment) =>
+          .map((assessment) => {
+            const hasOrg =
               assessment.orgId &&
               typeof assessment.orgId === 'object' &&
-              'name' in assessment.orgId,
-          )
-          .map((assessment) => ({
-            id: assessment._id.toString(),
-            orgId: assessment.orgId._id.toString(),
-            organizationName: assessment.orgId.name,
-            score: assessment.score,
-            overallRisk: assessment.overallRisk,
-            createdAt: assessment.createdAt.toISOString(),
-            conductedBy:
-              assessment.conductedBy &&
-              typeof assessment.conductedBy === 'object' &&
-              '_id' in assessment.conductedBy
-                ? {
-                    id: assessment.conductedBy._id.toString(),
-                    name: assessment.conductedBy.name,
-                    email: assessment.conductedBy.email,
-                    role: assessment.conductedBy.role,
-                  }
-                : null,
-          }))}
+              'name' in assessment.orgId;
+
+            return {
+              id: assessment._id.toString(),
+              orgId: hasOrg
+                ? assessment.orgId._id.toString()
+                : assessment.orgId?.toString() ?? '',
+              organizationName: hasOrg
+                ? assessment.orgId.name
+                : 'Deleted Organization',
+              score: assessment.score,
+              overallRisk: assessment.overallRisk,
+              createdAt: assessment.createdAt.toISOString(),
+              conductedBy:
+                assessment.conductedBy &&
+                typeof assessment.conductedBy === 'object' &&
+                '_id' in assessment.conductedBy
+                  ? {
+                      id: assessment.conductedBy._id.toString(),
+                      name: assessment.conductedBy.name,
+                      email: assessment.conductedBy.email,
+                      role: assessment.conductedBy.role,
+                    }
+                  : null,
+            };
+          })}
       />
     </div>
   );

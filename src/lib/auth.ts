@@ -10,7 +10,7 @@ import User from '@/models/User';
 
 export type AppSessionUser = DefaultSession['user'] & {
   id: string;
-  role: 'admin' | 'analyst' | 'viewer' | 'org_manager';
+  role: 'admin' | 'assessor';
 };
 
 /**
@@ -90,7 +90,7 @@ export const authConfig: NextAuthConfig = {
           name: user.name,
           email: user.email,
           provider: account.provider, // works for google & github
-          role: 'viewer',
+          role: account?.role || 'assessor',
           status: 'active',
           lastLoginAt: new Date(),
           sessionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
@@ -101,9 +101,7 @@ export const authConfig: NextAuthConfig = {
           {
             $set: {
               lastLoginAt: new Date(),
-              sessionExpiresAt: new Date(
-                Date.now() + 30 * 24 * 60 * 60 * 1000,
-              ),
+              sessionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             },
           },
         );
@@ -114,7 +112,7 @@ export const authConfig: NextAuthConfig = {
     async jwt({ token, user, account }) {
       if (user) {
         token.sub = user.id;
-        token.role = user.role ?? 'viewer';
+        token.role = user.role ?? 'assessor';
         token.name = user.name;
         token.email = user.email;
       }
@@ -124,7 +122,7 @@ export const authConfig: NextAuthConfig = {
         await dbConnect();
         const dbUser = await User.findOne({ email: token.email }).lean();
         if (dbUser) {
-          token.role = dbUser.role || 'viewer';
+          token.role = dbUser.role || 'assessor';
           token.sub = dbUser._id.toString();
         }
       }

@@ -29,7 +29,7 @@ export async function PATCH(
     const role = body?.role;
     const status = body?.status;
 
-    const allowedRoles = ['admin', 'analyst', 'viewer', 'org_manager'];
+    const allowedRoles = ['admin', 'assessor'];
     const allowedStatuses = ['active', 'pending', 'suspended'];
 
     if (

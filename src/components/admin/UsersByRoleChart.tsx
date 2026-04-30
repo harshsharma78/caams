@@ -12,9 +12,7 @@ import {
 
 const roleColors: Record<string, string> = {
   admin: '#EF4444',
-  analyst: '#3B82F6',
-  viewer: '#64748B',
-  org_manager: '#F59E0B',
+  assessor: '#3B82F6',
 };
 
 export function UsersByRoleChart({

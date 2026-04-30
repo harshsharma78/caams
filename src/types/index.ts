@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'analyst' | 'viewer' | 'org_manager';
+export type UserRole = 'admin' | 'assessor';
 export type OrganizationSize = 'startup' | 'sme' | 'enterprise';
 export type AssessmentStatus =
   | 'not-ready'
@@ -99,7 +99,7 @@ export interface InterviewDetail extends InterviewListItem {
 
 export interface CaseStudyFormValues {
   title: string;
-  organization: string;
+  orgId: string;
   sector: string;
   challenge: string;
   solution: string;
@@ -109,8 +109,10 @@ export interface CaseStudyFormValues {
   fileUrl: string;
 }
 
-export interface CaseStudyListItem extends CaseStudyFormValues {
+export interface CaseStudyListItem extends Omit<CaseStudyFormValues, 'orgId'> {
   id: string;
+  orgId: string;
+  organizationName: string;
   createdAt: string;
   uploadedBy?: UserSummary | null;
 }

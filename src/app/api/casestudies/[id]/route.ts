@@ -31,6 +31,7 @@ export async function GET(
     await dbConnect();
 
     const caseStudy = await CaseStudy.findById(parsedId.data)
+      .populate('orgId', 'name')
       .populate('uploadedBy', 'name email role')
       .lean();
 
@@ -43,11 +44,21 @@ export async function GET(
 
     clearAllStatsCaches();
 
+    const hasOrg =
+      caseStudy.orgId &&
+      typeof caseStudy.orgId === 'object' &&
+      'name' in caseStudy.orgId;
+
     return NextResponse.json({
       caseStudy: {
         id: caseStudy._id.toString(),
         title: caseStudy.title,
-        organization: caseStudy.organization,
+        orgId: hasOrg
+          ? caseStudy.orgId._id.toString()
+          : caseStudy.orgId?.toString() ?? '',
+        organizationName: hasOrg
+          ? caseStudy.orgId.name
+          : 'Deleted Organization',
         sector: caseStudy.sector,
         challenge: caseStudy.challenge,
         solution: caseStudy.solution,

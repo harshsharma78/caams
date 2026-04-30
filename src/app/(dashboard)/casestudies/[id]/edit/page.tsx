@@ -7,6 +7,7 @@ import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageOrganizations } from '@/lib/permissions';
 import CaseStudy from '@/models/CaseStudy';
+import Organization from '@/models/Organization';
 
 export const metadata: Metadata = {
   title: 'CAAMS | Edit Case Study',
@@ -27,7 +28,10 @@ export default async function EditCaseStudyPage({
 
   await dbConnect();
 
-  const caseStudy = await CaseStudy.findById(id).lean();
+  const [caseStudy, organizations] = await Promise.all([
+    CaseStudy.findById(id).lean(),
+    Organization.find({}).sort({ name: 1 }).lean(),
+  ]);
 
   if (!caseStudy) {
     notFound();
@@ -44,7 +48,7 @@ export default async function EditCaseStudyPage({
         caseStudyId={caseStudy._id.toString()}
         initialValues={{
           title: caseStudy.title,
-          organization: caseStudy.organization,
+          orgId: caseStudy.orgId.toString(),
           sector: caseStudy.sector,
           challenge: caseStudy.challenge,
           solution: caseStudy.solution,
@@ -53,6 +57,10 @@ export default async function EditCaseStudyPage({
           tags: caseStudy.tags,
           fileUrl: caseStudy.fileUrl,
         }}
+        organizations={organizations.map((org) => ({
+          id: org._id.toString(),
+          name: org.name,
+        }))}
       />
     </div>
   );

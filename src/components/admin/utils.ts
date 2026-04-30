@@ -42,10 +42,8 @@ export function roleBadge(role: string) {
   switch (role) {
     case 'admin':
       return 'bg-red-900/60 text-red-300 border border-red-700';
-    case 'analyst':
+    case 'assessor':
       return 'bg-blue-900/60 text-blue-300 border border-blue-700';
-    case 'org_manager':
-      return 'bg-amber-900/60 text-amber-300 border border-amber-700';
     default:
       return 'bg-slate-800 text-slate-400 border border-slate-600';
   }

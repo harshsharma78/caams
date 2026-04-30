@@ -65,33 +65,38 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       securityAssessments: securityChecks
-        .filter(
-          (securityCheck) =>
+        .map((securityCheck) => {
+          const hasOrg =
             securityCheck.orgId &&
             typeof securityCheck.orgId === 'object' &&
-            'name' in securityCheck.orgId,
-        )
-        .map((securityCheck) => ({
-          id: securityCheck._id.toString(),
-          orgId: securityCheck.orgId._id.toString(),
-          organizationName: securityCheck.orgId.name,
-          score: securityCheck.score,
-          overallRisk: securityCheck.overallRisk,
-          findings: securityCheck.findings,
-          recommendations: securityCheck.recommendations,
-          createdAt: securityCheck.createdAt.toISOString(),
-          conductedBy:
-            securityCheck.conductedBy &&
-            typeof securityCheck.conductedBy === 'object' &&
-            '_id' in securityCheck.conductedBy
-              ? {
-                  id: securityCheck.conductedBy._id.toString(),
-                  name: securityCheck.conductedBy.name,
-                  email: securityCheck.conductedBy.email,
-                  role: securityCheck.conductedBy.role,
-                }
-              : null,
-        })),
+            'name' in securityCheck.orgId;
+
+          return {
+            id: securityCheck._id.toString(),
+            orgId: hasOrg
+              ? securityCheck.orgId._id.toString()
+              : securityCheck.orgId?.toString() ?? '',
+            organizationName: hasOrg
+              ? securityCheck.orgId.name
+              : 'Deleted Organization',
+            score: securityCheck.score,
+            overallRisk: securityCheck.overallRisk,
+            findings: securityCheck.findings,
+            recommendations: securityCheck.recommendations,
+            createdAt: securityCheck.createdAt.toISOString(),
+            conductedBy:
+              securityCheck.conductedBy &&
+              typeof securityCheck.conductedBy === 'object' &&
+              '_id' in securityCheck.conductedBy
+                ? {
+                    id: securityCheck.conductedBy._id.toString(),
+                    name: securityCheck.conductedBy.name,
+                    email: securityCheck.conductedBy.email,
+                    role: securityCheck.conductedBy.role,
+                  }
+                : null,
+          };
+        }),
       pagination: {
         page,
         limit,

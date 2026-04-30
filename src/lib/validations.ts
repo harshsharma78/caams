@@ -23,7 +23,7 @@ export const registerSchema = z.object({
     .max(60, 'Name must be 60 characters or fewer.'),
   email: emailSchema,
   password: passwordSchema,
-  role: z.enum(['admin', 'viewer']),
+  role: z.enum(['admin', 'assessor']),
 });
 
 export const loginSchema = z.object({
@@ -101,11 +101,10 @@ export const caseStudySchema = z.object({
     .trim()
     .min(3, 'Title must be at least 3 characters.')
     .max(120, 'Title must be 120 characters or fewer.'),
-  organization: z
+  orgId: z
     .string()
     .trim()
-    .min(2, 'Organization must be at least 2 characters.')
-    .max(100, 'Organization must be 100 characters or fewer.'),
+    .regex(/^[a-f\d]{24}$/i, 'Select a valid organization.'),
   sector: z.enum(CASE_STUDY_SECTORS, {
     error: 'Select a valid sector.',
   }),

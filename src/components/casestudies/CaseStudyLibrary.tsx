@@ -40,7 +40,7 @@ export function CaseStudyLibrary({
       const matchesSearch =
         !query ||
         caseStudy.title.toLowerCase().includes(query) ||
-        caseStudy.organization.toLowerCase().includes(query);
+        caseStudy.organizationName.toLowerCase().includes(query);
       const matchesSector = sector === 'all' || caseStudy.sector === sector;
 
       return matchesSearch && matchesSector;
@@ -102,7 +102,7 @@ export function CaseStudyLibrary({
                     {caseStudy.title}
                   </h2>
                   <p className='mt-1 text-sm text-slate-600 dark:text-slate-300'>
-                    {caseStudy.organization}
+                    {caseStudy.organizationName}
                   </p>
                 </div>
                 <p className='text-sm leading-6 wrap-break-word text-slate-600 dark:text-slate-300'>

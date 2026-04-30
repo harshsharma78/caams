@@ -33,6 +33,7 @@ export default async function CaseStudyDetailPage({
   await dbConnect();
 
   const caseStudy = await CaseStudy.findById(id)
+    .populate('orgId', 'name')
     .populate('uploadedBy', 'name email role')
     .lean();
 
@@ -44,6 +45,7 @@ export default async function CaseStudyDetailPage({
     _id: { $ne: caseStudy._id },
     sector: caseStudy.sector,
   })
+    .populate('orgId', 'name')
     .sort({ createdAt: -1 })
     .limit(3)
     .lean();
@@ -54,11 +56,18 @@ export default async function CaseStudyDetailPage({
     { title: 'Outcome', content: caseStudy.outcome },
   ];
 
+  const orgName =
+    caseStudy.orgId &&
+    typeof caseStudy.orgId === 'object' &&
+    'name' in caseStudy.orgId
+      ? caseStudy.orgId.name
+      : 'Deleted Organization';
+
   return (
     <div className='space-y-8'>
       <PageHeader
         title={caseStudy.title}
-        description={`${caseStudy.organization} · ${caseStudy.sector}`}
+        description={`${orgName} · ${caseStudy.sector}`}
         action={
           <div className='flex flex-wrap items-center gap-3'>
             {canManage ? (
@@ -76,7 +85,7 @@ export default async function CaseStudyDetailPage({
                 />
               </>
             ) : null}
-            {caseStudy.fileUrl ? (
+            {/* {caseStudy.fileUrl ? (
               <Button asChild>
                 <a
                   href={caseStudy.fileUrl}
@@ -85,7 +94,7 @@ export default async function CaseStudyDetailPage({
                   Download PDF
                 </a>
               </Button>
-            ) : null}
+            ) : null} */}
           </div>
         }
       />
@@ -141,7 +150,7 @@ export default async function CaseStudyDetailPage({
                 <p className='font-medium text-slate-900 dark:text-slate-50'>
                   Organization
                 </p>
-                <p>{caseStudy.organization}</p>
+                <p>{orgName}</p>
               </div>
               <div>
                 <p className='font-medium text-slate-900 dark:text-slate-50'>
@@ -184,7 +193,11 @@ export default async function CaseStudyDetailPage({
                       {relatedCaseStudy.title}
                     </p>
                     <p className='mt-1 text-sm text-slate-500 dark:text-slate-400'>
-                      {relatedCaseStudy.organization}
+                      {relatedCaseStudy.orgId &&
+                      typeof relatedCaseStudy.orgId === 'object' &&
+                      'name' in relatedCaseStudy.orgId
+                        ? relatedCaseStudy.orgId.name
+                        : 'Deleted Organization'}
                     </p>
                   </Link>
                 ))

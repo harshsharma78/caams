@@ -27,8 +27,8 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'analyst', 'viewer', 'org_manager'],
-      default: 'viewer',
+      enum: ['admin', 'assessor'],
+      default: 'assessor',
       required: true,
     },
     status: {

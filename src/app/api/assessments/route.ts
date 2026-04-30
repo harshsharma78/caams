@@ -63,10 +63,19 @@ export async function GET(request: Request) {
       assessments: assessments.map((assessment) => {
         const interpretation = getScoreInterpretation(assessment.overallScore);
 
+        const hasOrg =
+          assessment.orgId &&
+          typeof assessment.orgId === 'object' &&
+          '_id' in assessment.orgId;
+
         return {
           id: assessment._id.toString(),
-          organizationId: assessment.orgId._id.toString(),
-          organizationName: assessment.orgId.name,
+          organizationId: hasOrg
+            ? assessment.orgId._id.toString()
+            : assessment.orgId?.toString() ?? '',
+          organizationName: hasOrg
+            ? assessment.orgId.name
+            : 'Deleted Organization',
           overallScore: assessment.overallScore,
           status: assessment.status,
           statusLabel: interpretation.label,

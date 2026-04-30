@@ -70,11 +70,11 @@ export function Sidebar({ open, role, onClose }: SidebarProps) {
             </h2>
           )}
           <p className='hidden text-sm text-slate-500 dark:text-slate-400 lg:block'>
-            Signed in as {role === 'admin' ? 'Administrator' : 'Viewer'}
+            Signed in as {role === 'admin' ? 'Administrator' : 'Assessor'}
           </p>
           {open && (
             <p className='text-sm text-slate-500 dark:text-slate-400 lg:hidden'>
-              Signed in as {role === 'admin' ? 'Administrator' : 'Viewer'}
+              Signed in as {role === 'admin' ? 'Administrator' : 'Assessor'}
             </p>
           )}
 
