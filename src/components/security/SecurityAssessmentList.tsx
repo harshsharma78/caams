@@ -40,8 +40,10 @@ export function SecurityAssessmentList({
     return assessments.filter((assessment) => {
       const matchesSearch =
         !query || assessment.organizationName.toLowerCase().includes(query);
+    
+      const risk = getSecurityRiskLevel(assessment.score);
       const matchesRisk =
-        riskFilter === 'all' || assessment.overallRisk === riskFilter;
+        riskFilter === 'all' || risk.level === riskFilter;
 
       return matchesSearch && matchesRisk;
     });

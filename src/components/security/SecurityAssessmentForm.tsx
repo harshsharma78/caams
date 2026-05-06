@@ -52,9 +52,19 @@ export function SecurityAssessmentForm({
   const [orgId, setOrgId] = useState(
     initialValues?.orgId ?? organizations[0]?.id ?? '',
   );
-  const [checklist, setChecklist] = useState(
-    initialValues?.checklist ?? buildDefaultSecurityChecklist,
-  );
+  const [checklist, setChecklist] = useState(() => {
+    const defaultChecklist = buildDefaultSecurityChecklist();
+    if (!initialValues?.checklist) return defaultChecklist;
+
+    // Merge saved responses into the template to ensure all 30 items are present
+    return defaultChecklist.map((templateItem) => {
+      const savedItem = initialValues.checklist.find(
+        (si) =>
+          si.category === templateItem.category && si.item === templateItem.item,
+      );
+      return savedItem || templateItem;
+    });
+  });
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
