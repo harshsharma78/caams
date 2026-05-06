@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: 'CAAMS',
   description:
     'Cloud Adoption Assessment and Management System for evaluating cloud readiness, interviews, case studies, and security posture.',
+  icons: {
+    icon: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
