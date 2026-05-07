@@ -13,7 +13,10 @@ import {
 } from 'recharts';
 
 import type { AdminSecurityCategoryBreakdownItem } from '@/types/admin-dashboard';
-import { ADMIN_CARD_CLASS, ADMIN_TOOLTIP_STYLE } from '@/components/admin/utils';
+import {
+  ADMIN_CARD_CLASS,
+  ADMIN_TOOLTIP_STYLE,
+} from '@/components/admin/utils';
 
 function fillColor(value: number) {
   if (value >= 80) return '#22C55E';
@@ -45,7 +48,7 @@ export function SecurityComplianceHeatmap({
       </div>
       {hasData ? (
         <div
-          className='h-[300px]'
+          className='h-75'
           aria-label='Security compliance chart'
           role='img'>
           <ResponsiveContainer

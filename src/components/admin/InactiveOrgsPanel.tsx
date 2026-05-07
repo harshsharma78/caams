@@ -3,6 +3,8 @@
 import { AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import { Button } from '@/components/ui/Button';
+
 import type { AdminInactiveOrganizationItem } from '@/types/admin-dashboard';
 
 export function InactiveOrgsPanel({
@@ -43,12 +45,14 @@ export function InactiveOrgsPanel({
                   year: 'numeric',
                 }).format(new Date(item.lastActivity))}
               </p>
-              <button
+              <Button
                 type='button'
-                className='mt-3 rounded border border-amber-700/50 px-2 py-0.5 text-xs text-amber-400 transition hover:text-amber-300'
+                variant='outline'
+                size='sm'
+                className='mt-3 border-amber-700/50 text-xs text-amber-400 hover:bg-amber-950/30 hover:text-amber-300'
                 onClick={() => toast.success(`Reminder queued for ${item.name}.`)}>
                 Send Reminder
-              </button>
+              </Button>
             </div>
           ))}
         </div>

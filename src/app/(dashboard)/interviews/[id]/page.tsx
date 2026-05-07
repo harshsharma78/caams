@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 
 import { DeleteInterviewButton } from '@/components/forms/DeleteInterviewButton';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -166,7 +167,7 @@ export default async function InterviewDetailPage({
                   target='_blank'
                   rel='noopener noreferrer'
                   className='mt-1 inline-flex items-center gap-1.5 font-medium text-sky-600 transition hover:text-sky-700'>
-                  View transcript / audio ↗
+                  View transcript / audio <ExternalLink className='ml-1 inline h-3.5 w-3.5' />
                 </a>
               </div>
             ) : null}
@@ -213,7 +214,7 @@ export default async function InterviewDetailPage({
       {/* Back link */}
       <div className='flex'>
         <Link href='/interviews'>
-          <Button variant='outline'>← Back to interviews</Button>
+          <Button variant='outline'><ArrowLeft className='h-4 w-4' /> Back to interviews</Button>
         </Link>
       </div>
     </div>

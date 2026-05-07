@@ -1,7 +1,14 @@
 'use client';
 
 import { CreditCard } from 'lucide-react';
-import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import {
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from 'recharts';
 
 import type { AdminSubscriptionBreakdownItem } from '@/types/admin-dashboard';
 import {
@@ -33,7 +40,9 @@ export function SubscriptionBreakdownChart({
           <CreditCard className='h-5 w-5' />
         </div>
         <div>
-          <h3 className='text-lg font-semibold text-slate-100'>Subscription Breakdown</h3>
+          <h3 className='text-lg font-semibold text-slate-100'>
+            Subscription Breakdown
+          </h3>
           <p className='text-sm text-slate-400'>
             Plan mix across active platform subscriptions.
           </p>
@@ -41,7 +50,7 @@ export function SubscriptionBreakdownChart({
       </div>
       {hasData ? (
         <div
-          className='h-[300px]'
+          className='h-75'
           aria-label='Subscription breakdown chart'
           role='img'>
           <ResponsiveContainer
@@ -72,10 +81,12 @@ export function SubscriptionBreakdownChart({
               <Legend
                 verticalAlign='bottom'
                 formatter={(value, entry) => {
-                  const payload = entry.payload as AdminSubscriptionBreakdownItem;
+                  const payload =
+                    entry.payload as AdminSubscriptionBreakdownItem;
                   return (
                     <span className='text-sm text-slate-400'>
-                      {String(value)} · {payload.count} · {formatCurrency(payload.revenue)}
+                      {String(value)} · {payload.count} ·{' '}
+                      {formatCurrency(payload.revenue)}
                     </span>
                   );
                 }}

@@ -12,7 +12,10 @@ import {
 } from 'recharts';
 
 import type { AdminWeekCount } from '@/types/admin-dashboard';
-import { ADMIN_CARD_CLASS, ADMIN_TOOLTIP_STYLE } from '@/components/admin/utils';
+import {
+  ADMIN_CARD_CLASS,
+  ADMIN_TOOLTIP_STYLE,
+} from '@/components/admin/utils';
 
 export function UserGrowthChart({ data }: { data: AdminWeekCount[] }) {
   const hasData = data.some((item) => item.count > 0);
@@ -32,7 +35,7 @@ export function UserGrowthChart({ data }: { data: AdminWeekCount[] }) {
       </div>
       {hasData ? (
         <div
-          className='h-[300px]'
+          className='h-75'
           aria-label='User growth chart'
           role='img'>
           <ResponsiveContainer

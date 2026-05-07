@@ -32,7 +32,7 @@ export function RiskDistributionChart({
       </div>
       {total > 0 ? (
         <div
-          className='h-[300px]'
+          className='h-75'
           aria-label='Risk distribution chart'
           role='img'>
           <ResponsiveContainer

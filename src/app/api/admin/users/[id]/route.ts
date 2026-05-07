@@ -107,3 +107,50 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const session = await auth();
+
+    if (!session?.user || !isAdmin(session.user.role)) {
+      return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+    }
+
+    const { id } = await params;
+    const parsedId = objectIdSchema.safeParse(id);
+
+    if (!parsedId.success) {
+      return NextResponse.json({ error: 'Invalid user ID.' }, { status: 400 });
+    }
+
+    // Prevent self-deletion
+    if (parsedId.data === session.user.id) {
+      return NextResponse.json(
+        { error: 'You cannot delete your own account.' },
+        { status: 400 },
+      );
+    }
+
+    await dbConnect();
+
+    const user = await User.findByIdAndDelete(parsedId.data).lean();
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found.' }, { status: 404 });
+    }
+
+    clearAllStatsCaches();
+
+    return NextResponse.json({ message: 'User deleted successfully.' });
+  } catch (error) {
+    console.error('Admin user DELETE error:', error);
+
+    return NextResponse.json(
+      { error: 'Failed to delete user.' },
+      { status: 500 },
+    );
+  }
+}

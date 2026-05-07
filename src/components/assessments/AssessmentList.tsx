@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Input } from '@/components/ui/Input';
+import { Pagination } from '@/components/ui/Pagination';
 import {
   Select,
   SelectContent,
@@ -18,6 +19,8 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import type { AssessmentListItem, OrganizationListItem } from '@/types';
+
+const PAGE_SIZE = 10;
 
 interface AssessmentListProps {
   assessments: AssessmentListItem[];
@@ -31,6 +34,7 @@ export function AssessmentList({
   const [organizationId, setOrganizationId] = useState('all');
   const [minScore, setMinScore] = useState('');
   const [maxScore, setMaxScore] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredAssessments = useMemo(() => {
     return assessments.filter((assessment) => {
@@ -46,6 +50,24 @@ export function AssessmentList({
     });
   }, [assessments, maxScore, minScore, organizationId]);
 
+  const totalItems = filteredAssessments.length;
+  const pageCount = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  const safePage = Math.min(currentPage, pageCount);
+  const pagedAssessments = filteredAssessments.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
+
+  // Prevent alphabetic input in score fields (Task 15)
+  const handleNumericFilter = (
+    setter: (value: string) => void,
+    rawValue: string,
+  ) => {
+    const numericOnly = rawValue.replace(/[^0-9.]/g, '');
+    setter(numericOnly);
+    setCurrentPage(1);
+  };
+
   return (
     <Card>
       <CardContent className='space-y-6 p-6'>
@@ -56,9 +78,12 @@ export function AssessmentList({
             </span>
             <Select
               value={organizationId}
-              onValueChange={setOrganizationId}>
+              onValueChange={(value) => {
+                setOrganizationId(value);
+                setCurrentPage(1);
+              }}>
               <SelectTrigger>
-                <SelectValue placeholder='All organizations' />
+                <SelectValue placeholder='Select Organization' />
               </SelectTrigger>
               <SelectContent className='border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50'>
                 <SelectItem value='all'>All organizations</SelectItem>
@@ -74,23 +99,21 @@ export function AssessmentList({
           </label>
           <Input
             label='Min score'
-            type='number'
             className='no-spinner'
-            min={0}
-            max={100}
             value={minScore}
-            onChange={(event) => setMinScore(event.target.value)}
-            placeholder='0'
+            onChange={(event) =>
+              handleNumericFilter(setMinScore, event.target.value)
+            }
+            placeholder='Enter Min Score'
           />
           <Input
             label='Max score'
-            type='number'
             className='no-spinner'
-            min={0}
-            max={100}
             value={maxScore}
-            onChange={(event) => setMaxScore(event.target.value)}
-            placeholder='100'
+            onChange={(event) =>
+              handleNumericFilter(setMaxScore, event.target.value)
+            }
+            placeholder='Enter Max Score'
           />
         </div>
         <div className='overflow-x-auto'>
@@ -105,8 +128,8 @@ export function AssessmentList({
               </tr>
             </thead>
             <tbody className='divide-y divide-slate-200 text-sm dark:divide-slate-800'>
-              {filteredAssessments.length ? (
-                filteredAssessments.map((assessment) => (
+              {pagedAssessments.length ? (
+                pagedAssessments.map((assessment) => (
                   <tr key={assessment.id}>
                     <td className='px-6 py-4'>
                       <div className='space-y-1'>
@@ -176,6 +199,7 @@ export function AssessmentList({
                           setOrganizationId('all');
                           setMinScore('');
                           setMaxScore('');
+                          setCurrentPage(1);
                         }}
                       />
                     )}
@@ -185,6 +209,15 @@ export function AssessmentList({
             </tbody>
           </table>
         </div>
+        {totalItems > PAGE_SIZE && (
+          <Pagination
+            currentPage={safePage}
+            totalItems={totalItems}
+            pageSize={PAGE_SIZE}
+            onPageChange={setCurrentPage}
+            itemLabel='assessments'
+          />
+        )}
       </CardContent>
     </Card>
   );

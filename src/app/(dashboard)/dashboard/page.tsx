@@ -121,40 +121,52 @@ export default async function DashboardPage() {
 
           <SectionDivider />
           <div className='grid gap-6 xl:grid-cols-3'>
-            <div className='xl:col-span-2'>
+            <div className='min-w-0 xl:col-span-2'>
               <AssessmentScoresByIndustry data={data.scoresByIndustry} />
             </div>
-            <div>
+            <div className='min-w-0'>
               <RiskDistributionChart data={data.riskDistribution} />
             </div>
           </div>
 
           <SectionDivider />
           <div className='grid gap-6 xl:grid-cols-2'>
-            <AssessmentsTrendChart data={data.assessmentsTrend} />
-            <CategoryRadarChart data={data.categoryAverages} />
+            <div className='min-w-0'>
+              <AssessmentsTrendChart data={data.assessmentsTrend} />
+            </div>
+            <div className='min-w-0'>
+              <CategoryRadarChart data={data.categoryAverages} />
+            </div>
           </div>
 
           <SectionDivider />
           <div className='grid gap-6 xl:grid-cols-2'>
-            <OrgSizeDistribution data={data.orgSizeDistribution} />
-            <CaseStudiesBySector data={data.caseStudiesBySector} />
+            <div className='min-w-0'>
+              <OrgSizeDistribution data={data.orgSizeDistribution} />
+            </div>
+            <div className='min-w-0'>
+              <CaseStudiesBySector data={data.caseStudiesBySector} />
+            </div>
           </div>
 
           <SectionDivider />
           <div className='grid gap-6 xl:grid-cols-2'>
-            <SecurityComplianceHeatmap
-              data={data.securityCategoryBreakdown}
-            />
-            <InterviewsMonthlyChart data={data.interviewsByMonth} />
+            <div className='min-w-0'>
+              <SecurityComplianceHeatmap
+                data={data.securityCategoryBreakdown}
+              />
+            </div>
+            <div className='min-w-0'>
+              <InterviewsMonthlyChart data={data.interviewsByMonth} />
+            </div>
           </div>
 
           <SectionDivider />
           <div className='grid gap-6 xl:grid-cols-3'>
-            <div className='xl:col-span-2'>
+            <div className='min-w-0 xl:col-span-2'>
               <TopOrganizationsTable data={data.topOrganizations} />
             </div>
-            <div>
+            <div className='min-w-0'>
               <RecentActivityFeed data={data.recentActivity} />
             </div>
           </div>

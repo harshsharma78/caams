@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Input } from '@/components/ui/Input';
+import { Pagination } from '@/components/ui/Pagination';
 import { DeleteSecurityAssessmentButton } from '@/components/security/DeleteSecurityAssessmentButton';
 import {
   Select,
@@ -22,6 +23,8 @@ import { getSecurityRiskLevel } from '@/lib/securityEngine';
 import { cn } from '@/lib/utils';
 import type { SecurityAssessmentListItem } from '@/types';
 
+const PAGE_SIZE = 10;
+
 interface SecurityAssessmentListProps {
   assessments: SecurityAssessmentListItem[];
   canManage?: boolean;
@@ -33,6 +36,7 @@ export function SecurityAssessmentList({
 }: SecurityAssessmentListProps) {
   const [search, setSearch] = useState('');
   const [riskFilter, setRiskFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredAssessments = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -49,6 +53,15 @@ export function SecurityAssessmentList({
     });
   }, [assessments, riskFilter, search]);
 
+  // Reset page when filters change
+  const totalItems = filteredAssessments.length;
+  const pageCount = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  const safePage = Math.min(currentPage, pageCount);
+  const pagedAssessments = filteredAssessments.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
+
   return (
     <div className='space-y-6'>
       <Card>
@@ -56,7 +69,10 @@ export function SecurityAssessmentList({
           <Input
             label='Search'
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setCurrentPage(1);
+            }}
             placeholder='Search by organization'
           />
           <label className='block space-y-1.5'>
@@ -65,7 +81,10 @@ export function SecurityAssessmentList({
             </span>
             <Select
               value={riskFilter}
-              onValueChange={setRiskFilter}>
+              onValueChange={(value) => {
+                setRiskFilter(value);
+                setCurrentPage(1);
+              }}>
               <SelectTrigger>
                 <SelectValue placeholder='Filter by risk level' />
               </SelectTrigger>
@@ -82,7 +101,7 @@ export function SecurityAssessmentList({
       </Card>
 
       <div className='grid gap-5 md:grid-cols-2 xl:grid-cols-3'>
-        {filteredAssessments.map((assessment) => {
+        {pagedAssessments.map((assessment) => {
           const risk = getSecurityRiskLevel(assessment.score);
 
           return (
@@ -117,12 +136,12 @@ export function SecurityAssessmentList({
                 </p>
                 <div className='mt-auto flex items-center justify-between gap-3'>
                   {canManage ? (
-                    <div className='flex items-center gap-3'>
-                      <Link
-                        href={`/security/${assessment.id}/edit`}
-                        className='text-sm font-medium text-sky-600 transition hover:text-sky-700'>
-                        Edit
-                      </Link>
+                    <div className='flex items-center gap-2'>
+                      <Button asChild variant='outline' size='sm'>
+                        <Link href={`/security/${assessment.id}/edit`}>
+                          Edit
+                        </Link>
+                      </Button>
                       <DeleteSecurityAssessmentButton
                         id={assessment.id}
                         organizationName={assessment.organizationName}
@@ -140,6 +159,16 @@ export function SecurityAssessmentList({
           );
         })}
       </div>
+
+      {totalItems > PAGE_SIZE && (
+        <Pagination
+          currentPage={safePage}
+          totalItems={totalItems}
+          pageSize={PAGE_SIZE}
+          onPageChange={setCurrentPage}
+          itemLabel='assessments'
+        />
+      )}
 
       {!filteredAssessments.length ? (
         assessments.length === 0 ? (
@@ -159,6 +188,7 @@ export function SecurityAssessmentList({
             onAction={() => {
               setSearch('');
               setRiskFilter('all');
+              setCurrentPage(1);
             }}
           />
         )

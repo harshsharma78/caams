@@ -4,7 +4,10 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import toast from 'react-hot-toast';
 
+import { Trash2 } from 'lucide-react';
+
 import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
 
 export function DeleteCaseStudyButton({
   id,
@@ -20,12 +23,15 @@ export function DeleteCaseStudyButton({
 
   return (
     <>
-      <button
+      <Button
         type='button'
-        className='text-sm font-medium text-rose-600 transition hover:text-rose-700'
+        variant='outline'
+        size='sm'
+        className='border-rose-300 text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:border-rose-700 dark:text-rose-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-300'
         onClick={() => setOpen(true)}>
+        <Trash2 className='h-3.5 w-3.5' />
         Delete
-      </button>
+      </Button>
       <Modal
         open={open}
         title='Delete case study'

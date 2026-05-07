@@ -37,7 +37,7 @@ export function AuditEventsTrendChart({
       </div>
       {hasData ? (
         <div
-          className='h-[300px]'
+          className='h-75 min-w-35'
           aria-label='Audit events trend chart'
           role='img'>
           <ResponsiveContainer
@@ -70,7 +70,7 @@ export function AuditEventsTrendChart({
           </ResponsiveContainer>
         </div>
       ) : (
-        <p className='py-20 text-center text-sm text-slate-400'>
+        <p className='min-w-30 space-y-2 py-20 text-center text-sm text-slate-400'>
           No audit events recorded
         </p>
       )}

@@ -121,7 +121,7 @@ export default async function CaseStudyDetailPage({
                 <h2 className='text-xl font-semibold text-slate-900 dark:text-slate-50'>
                   {section.title}
                 </h2>
-                <div className='wrap-break-word whitespace-pre-wrap max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-300'>
+                <div className='whitespace-pre-wrap wrap-break-word max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-300'>
                   {section.content}
                 </div>
               </div>

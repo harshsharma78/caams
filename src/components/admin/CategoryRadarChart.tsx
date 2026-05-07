@@ -36,7 +36,7 @@ export function CategoryRadarChart({
       </div>
       {hasData ? (
         <div
-          className='h-[300px]'
+          className="h-75"
           aria-label='Category radar chart'
           role='img'>
           <ResponsiveContainer
