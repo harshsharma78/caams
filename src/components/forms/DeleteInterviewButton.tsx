@@ -4,7 +4,10 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import toast from 'react-hot-toast';
 
+import { Trash2 } from 'lucide-react';
+
 import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
 
 interface DeleteInterviewButtonProps {
   id: string;
@@ -22,13 +25,16 @@ export function DeleteInterviewButton({
 
   return (
     <>
-      <button
+      <Button
         type='button'
+        variant='outline'
+        size='sm'
         disabled={isPending}
-        className='cursor-pointer font-medium text-rose-600 transition hover:text-rose-700 disabled:opacity-50'
+        className='border-rose-300 text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:border-rose-700 dark:text-rose-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-300'
         onClick={() => setOpen(true)}>
+        <Trash2 className='h-3.5 w-3.5' />
         {isPending ? 'Deleting...' : 'Delete'}
-      </button>
+      </Button>
       <Modal
         open={open}
         title='Delete interview'

@@ -13,7 +13,10 @@ import {
 } from 'recharts';
 
 import type { AdminSystemErrorTrendPoint } from '@/types/admin-dashboard';
-import { ADMIN_CARD_CLASS, ADMIN_TOOLTIP_STYLE } from '@/components/admin/utils';
+import {
+  ADMIN_CARD_CLASS,
+  ADMIN_TOOLTIP_STYLE,
+} from '@/components/admin/utils';
 
 export function SystemErrorTrendChart({
   data,
@@ -29,15 +32,18 @@ export function SystemErrorTrendChart({
           <Activity className='h-5 w-5' />
         </div>
         <div>
-          <h3 className='text-lg font-semibold text-slate-100'>System Error Trend</h3>
+          <h3 className='text-lg font-semibold text-slate-100'>
+            System Error Trend
+          </h3>
           <p className='text-sm text-slate-400'>
-            Hourly API request volume versus server errors over the last 24 hours.
+            Hourly API request volume versus server errors over the last 24
+            hours.
           </p>
         </div>
       </div>
       {hasData ? (
         <div
-          className='h-[300px]'
+          className='h-75'
           aria-label='System error trend chart'
           role='img'>
           <ResponsiveContainer

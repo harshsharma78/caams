@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useTransition } from 'react';
+import { useMemo, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
 import toast from 'react-hot-toast';
@@ -137,6 +137,24 @@ export function CaseStudyForm({
   const [isUploading, setIsUploading] = useState(false);
   const [isPending, startTransition] = useTransition();
 
+  /** Max file size for client-side validation (10 MB) */
+  const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+
+  // Track whether anything has changed from initial values (Task 6)
+  const hasChanges = useMemo(() => {
+    if (mode === 'create') return true;
+    return (Object.keys(initialValues) as (keyof CaseStudyFormValues)[]).some(
+      (key) => {
+        const current = values[key];
+        const initial = initialValues[key];
+        if (Array.isArray(current) && Array.isArray(initial)) {
+          return JSON.stringify(current) !== JSON.stringify(initial);
+        }
+        return current !== initial;
+      },
+    );
+  }, [mode, values, initialValues]);
+
   const handleChange = <K extends keyof CaseStudyFormValues>(
     key: K,
     value: CaseStudyFormValues[K],
@@ -227,7 +245,7 @@ export function CaseStudyForm({
               label='Title'
               value={values.title}
               onChange={(event) => handleChange('title', event.target.value)}
-              placeholder='Cloud migration modernization for regulated workloads'
+              placeholder='Enter Case Study Title'
               error={fieldErrors.title}
             />
             <label className='block space-y-1.5'>
@@ -238,7 +256,7 @@ export function CaseStudyForm({
                 value={values.orgId}
                 onValueChange={(value) => handleChange('orgId', value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder='Select organization' />
+                  <SelectValue placeholder='Select Organization' />
                 </SelectTrigger>
                 <SelectContent className='border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50'>
                   {organizations.map((org) => (
@@ -262,7 +280,7 @@ export function CaseStudyForm({
                   handleChange('sector', value as CaseStudyFormValues['sector'])
                 }>
                 <SelectTrigger>
-                  <SelectValue placeholder='Select sector' />
+                  <SelectValue placeholder='Select Sector' />
                 </SelectTrigger>
                 <SelectContent className='border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50'>
                   {CASE_STUDY_SECTORS.map((sector) => (
@@ -282,7 +300,7 @@ export function CaseStudyForm({
               label='Results Summary'
               value={values.results}
               onChange={(event) => handleChange('results', event.target.value)}
-              placeholder='30% cost reduction, 99.95% uptime, 2x deployment speed'
+              placeholder='Enter Results Summary'
               error={fieldErrors.results}
             />
           </div>
@@ -291,7 +309,7 @@ export function CaseStudyForm({
             label='Challenge'
             value={values.challenge}
             onChange={(value) => handleChange('challenge', value)}
-            placeholder='Describe the business and technical challenge.'
+            placeholder='Enter Challenge Description'
             error={fieldErrors.challenge}
           />
 
@@ -299,7 +317,7 @@ export function CaseStudyForm({
             label='Solution'
             value={values.solution}
             onChange={(value) => handleChange('solution', value)}
-            placeholder='Describe the implemented cloud solution.'
+            placeholder='Enter Solution Description'
             error={fieldErrors.solution}
           />
 
@@ -307,7 +325,7 @@ export function CaseStudyForm({
             label='Outcome'
             value={values.outcome}
             onChange={(value) => handleChange('outcome', value)}
-            placeholder='Describe measurable outcomes and organizational impact.'
+            placeholder='Enter Outcome Description'
             error={fieldErrors.outcome}
           />
 
@@ -318,7 +336,7 @@ export function CaseStudyForm({
                   label='Tags'
                   value={tagInput}
                   onChange={(event) => setTagInput(event.target.value)}
-                  placeholder='Add tags like migration, zero-downtime, finops'
+                  placeholder='Enter Tags'
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ',') {
                       event.preventDefault();
@@ -365,7 +383,7 @@ export function CaseStudyForm({
                 label='Case Study PDF URL'
                 value={values.fileUrl}
                 onChange={(event) => handleChange('fileUrl', event.target.value)}
-                placeholder='https://res.cloudinary.com/...'
+                placeholder='Enter File URL'
                 error={fieldErrors.fileUrl}
               />
               <label className='block space-y-1.5'>
@@ -381,6 +399,11 @@ export function CaseStudyForm({
                     const file = event.target.files?.[0];
 
                     if (!file) {
+                      return;
+                    }
+
+                    if (file.size > MAX_FILE_SIZE_BYTES) {
+                      setUploadError('File size must not exceed 10 MB.');
                       return;
                     }
 
@@ -444,7 +467,7 @@ export function CaseStudyForm({
             </Button>
             <Button
               type='submit'
-              disabled={isPending || isUploading}>
+              disabled={isPending || isUploading || !hasChanges}>
               {isPending
                 ? mode === 'edit'
                   ? 'Updating...'

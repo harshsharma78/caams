@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/Button';
@@ -20,6 +20,9 @@ import {
   STANDARD_INTERVIEW_QUESTIONS,
 } from '@/lib/validations';
 import type { InterviewFormValues } from '@/types';
+
+/** Max file size for client-side validation (10 MB) */
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
 interface Organization {
   id: string;
@@ -57,6 +60,19 @@ export function InterviewForm({ organizations }: InterviewFormProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isPending, startTransition] = useTransition();
 
+  // Track whether anything has changed from initial/default values (Task 6)
+  const hasChanges = useMemo(() => {
+    return (
+      values.orgId !== '' ||
+      values.intervieweeName !== '' ||
+      values.designation !== '' ||
+      values.department !== '' ||
+      values.experience !== '' ||
+      values.fileUrl !== '' ||
+      values.responses.some((r) => r.answer !== '')
+    );
+  }, [values]);
+
   const handleChange = <K extends keyof InterviewFormValues>(
     key: K,
     value: InterviewFormValues[K],
@@ -82,6 +98,12 @@ export function InterviewForm({ organizations }: InterviewFormProps) {
       delete updated[index];
       return updated;
     });
+  };
+
+  // Prevent alphabetic input in experience field (Task 15)
+  const handleExperienceChange = (rawValue: string) => {
+    const numericOnly = rawValue.replace(/[^0-9.+\s]/g, '');
+    handleChange('experience', numericOnly);
   };
 
   return (
@@ -148,7 +170,7 @@ export function InterviewForm({ organizations }: InterviewFormProps) {
                 value={values.orgId}
                 onValueChange={(value) => handleChange('orgId', value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder='Select organization' />
+                  <SelectValue placeholder='Select Organization' />
                 </SelectTrigger>
                 <SelectContent className='border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50'>
                   {organizations.map((org) => (
@@ -172,7 +194,6 @@ export function InterviewForm({ organizations }: InterviewFormProps) {
               }
               placeholder='Enter Full Name'
               error={fieldErrors.intervieweeName}
-              required
             />
             <Input
               label='Designation'
@@ -182,7 +203,6 @@ export function InterviewForm({ organizations }: InterviewFormProps) {
               }
               placeholder='Enter Designation'
               error={fieldErrors.designation}
-              required
             />
             <Input
               label='Department'
@@ -192,17 +212,15 @@ export function InterviewForm({ organizations }: InterviewFormProps) {
               }
               placeholder='Enter Department'
               error={fieldErrors.department}
-              required
             />
             <Input
-              label='Years of experience'
+              label='Years of Experience'
               value={values.experience}
               onChange={(event) =>
-                handleChange('experience', event.target.value)
+                handleExperienceChange(event.target.value)
               }
               placeholder='Enter Years of Experience'
               error={fieldErrors.experience}
-              required
             />
           </div>
         </CardContent>
@@ -241,7 +259,7 @@ export function InterviewForm({ organizations }: InterviewFormProps) {
                   onChange={(event) =>
                     handleResponseChange(index, event.target.value)
                   }
-                  placeholder='Enter the interviewee&#39;s response...'
+                  placeholder='Enter Response'
                   rows={3}
                   error={responseErrors[index]}
                 />
@@ -268,7 +286,7 @@ export function InterviewForm({ organizations }: InterviewFormProps) {
               label='File / audio URL'
               value={values.fileUrl}
               onChange={(event) => handleChange('fileUrl', event.target.value)}
-              placeholder='https://res.cloudinary.com/...'
+              placeholder='Enter File URL'
               error={fieldErrors.fileUrl}
             />
             <label className='block space-y-1.5'>
@@ -284,6 +302,11 @@ export function InterviewForm({ organizations }: InterviewFormProps) {
                   const file = event.target.files?.[0];
 
                   if (!file) {
+                    return;
+                  }
+
+                  if (file.size > MAX_FILE_SIZE_BYTES) {
+                    setUploadError('File size must not exceed 10 MB.');
                     return;
                   }
 
@@ -331,6 +354,7 @@ export function InterviewForm({ organizations }: InterviewFormProps) {
       {error ? <p className='text-sm text-rose-600'>{error}</p> : null}
       <div className='flex flex-col gap-3 sm:flex-row sm:justify-end'>
         <Button
+          type='button'
           variant='outline'
           disabled={isPending || isUploading}
           onClick={() => router.push('/interviews')}>
@@ -338,7 +362,7 @@ export function InterviewForm({ organizations }: InterviewFormProps) {
         </Button>
         <Button
           type='submit'
-          disabled={isPending || isUploading}>
+          disabled={isPending || isUploading || !hasChanges}>
           {isPending ? 'Saving interview...' : 'Save interview'}
         </Button>
       </div>

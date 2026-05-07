@@ -269,7 +269,7 @@ export function ReportGenerator({ organizations }: ReportGeneratorProps) {
               value={selectedOrgId}
               onValueChange={setSelectedOrgId}>
               <SelectTrigger>
-                <SelectValue placeholder='Select an organization' />
+                <SelectValue placeholder='Select Organization' />
               </SelectTrigger>
               <SelectContent className='border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50'>
                 {organizations.map((org) => (

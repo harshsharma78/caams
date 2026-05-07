@@ -37,7 +37,7 @@ export function AssessmentScoresByIndustry({
       </div>
       {data.length ? (
         <div
-          className='h-[300px]'
+          className='h-75'
           aria-label='Assessment scores by industry chart'
           role='img'>
           <ResponsiveContainer

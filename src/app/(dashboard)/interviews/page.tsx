@@ -1,13 +1,9 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-
-import { Users } from 'lucide-react';
 
 import { InterviewFilters } from '@/components/forms/InterviewFilters';
-import { DeleteInterviewButton } from '@/components/forms/DeleteInterviewButton';
+import { InterviewTable } from '@/components/interviews/InterviewTable';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent } from '@/components/ui/Card';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { auth } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { canManageInterviews } from '@/lib/permissions';
@@ -71,6 +67,26 @@ export default async function InterviewsPage({
 
   const canManage = canManageInterviews(session.user.role);
 
+  const rows = interviews.map((interview) => {
+    const org =
+      interview.orgId &&
+      typeof interview.orgId === 'object' &&
+      'name' in interview.orgId
+        ? interview.orgId
+        : null;
+
+    return {
+      id: interview._id.toString(),
+      intervieweeName: interview.intervieweeName,
+      experience: interview.experience,
+      orgName: org ? (org as { name: string }).name : null,
+      orgId: org ? (org as { _id: { toString(): string } })._id.toString() : null,
+      designation: interview.designation,
+      department: interview.department,
+      date: new Date(interview.date).toISOString(),
+    };
+  });
+
   return (
     <div className='space-y-8'>
       <PageHeader
@@ -90,98 +106,10 @@ export default async function InterviewsPage({
       />
       <Card>
         <CardContent className='p-0'>
-          <div className='overflow-x-auto'>
-            <table className='min-w-full divide-y divide-slate-200 dark:divide-slate-800'>
-              <thead className='bg-slate-50 dark:bg-slate-950'>
-                <tr className='text-left text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400'>
-                  <th className='px-6 py-4'>Interviewee</th>
-                  <th className='px-6 py-4'>Organization</th>
-                  <th className='px-6 py-4'>Designation</th>
-                  <th className='px-6 py-4'>Department</th>
-                  <th className='px-6 py-4'>Date</th>
-                  <th className='px-6 py-4'>Actions</th>
-                </tr>
-              </thead>
-              <tbody className='divide-y divide-slate-200 text-sm dark:divide-slate-800'>
-                {interviews.length ? (
-                  interviews.map((interview) => {
-                    const org =
-                      interview.orgId &&
-                      typeof interview.orgId === 'object' &&
-                      'name' in interview.orgId
-                        ? interview.orgId
-                        : null;
-
-                    return (
-                      <tr key={interview._id.toString()}>
-                        <td className='px-6 py-4'>
-                          <div className='space-y-1'>
-                            <Link
-                              href={`/interviews/${interview._id.toString()}`}
-                              className='font-medium text-slate-900 hover:text-sky-600 dark:text-slate-50'>
-                              {interview.intervieweeName}
-                            </Link>
-                            <p className='text-slate-500 dark:text-slate-400'>
-                              {interview.experience} experience
-                            </p>
-                          </div>
-                        </td>
-                        <td className='px-6 py-4 text-slate-600 dark:text-slate-300'>
-                          {org ? (
-                            <Link
-                              href={`/organizations/${org._id.toString()}`}
-                              className='hover:text-sky-600'>
-                              {org.name}
-                            </Link>
-                          ) : (
-                            'Unknown'
-                          )}
-                        </td>
-                        <td className='px-6 py-4 text-slate-600 dark:text-slate-300'>
-                          {interview.designation}
-                        </td>
-                        <td className='px-6 py-4 text-slate-600 dark:text-slate-300'>
-                          {interview.department}
-                        </td>
-                        <td className='px-6 py-4 text-slate-600 dark:text-slate-300'>
-                          {new Intl.DateTimeFormat('en-IN', {
-                            dateStyle: 'medium',
-                          }).format(interview.date)}
-                        </td>
-                        <td className='px-6 py-4'>
-                          <div className='flex items-center gap-4'>
-                            <Link
-                              href={`/interviews/${interview._id.toString()}`}
-                              className='font-medium text-sky-600 transition hover:text-sky-700'>
-                              View
-                            </Link>
-                            {canManage ? (
-                              <DeleteInterviewButton
-                                id={interview._id.toString()}
-                                intervieweeName={interview.intervieweeName}
-                              />
-                            ) : null}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={6} className='p-0'>
-                      <EmptyState
-                        icon={<Users className="h-8 w-8" />}
-                        title="No interviews"
-                        description="Record cloud computing experience interviews."
-                        actionLabel={canManage ? "New interview" : undefined}
-                        actionHref={canManage ? "/interviews/new" : undefined}
-                      />
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+          <InterviewTable
+            interviews={rows}
+            canManage={canManage}
+          />
         </CardContent>
       </Card>
     </div>

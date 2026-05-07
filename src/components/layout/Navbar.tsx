@@ -1,5 +1,6 @@
 'use client';
 
+import { Menu } from 'lucide-react';
 import type { AppSessionUser } from '@/lib/auth';
 import { LogoutButton } from '@/components/layout/LogoutButton';
 interface NavbarProps {
@@ -15,11 +16,12 @@ export function Navbar({ user, onMenuClick }: NavbarProps) {
           className='inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 md:hidden'
           onClick={onMenuClick}
           aria-label='Open navigation'>
-          ☰
+          <Menu className='h-5 w-5' />
         </button>
         <div>
           <p className='text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400'>
-            Cloud Adoption Assessment and Management System
+            <span className='lg:hidden'>CAAMS</span>
+            <span className='hidden lg:inline'>Cloud Adoption Assessment and Management System</span>
           </p>
           <h1 className='text-lg font-semibold text-slate-900 dark:text-slate-50'>
             Workspace

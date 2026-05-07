@@ -1,7 +1,14 @@
 'use client';
 
 import { Users } from 'lucide-react';
-import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import {
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from 'recharts';
 
 import type { AdminRoleCount } from '@/types/admin-dashboard';
 import {
@@ -31,7 +38,9 @@ export function UsersByRoleChart({
           <Users className='h-5 w-5' />
         </div>
         <div>
-          <h3 className='text-lg font-semibold text-slate-100'>Users by Role</h3>
+          <h3 className='text-lg font-semibold text-slate-100'>
+            Users by Role
+          </h3>
           <p className='text-sm text-slate-400'>
             Distribution of platform access roles across all users.
           </p>
@@ -39,7 +48,7 @@ export function UsersByRoleChart({
       </div>
       {hasData ? (
         <div
-          className='h-[300px]'
+          className='h-75'
           aria-label='Users by role chart'
           role='img'>
           <ResponsiveContainer
@@ -56,7 +65,10 @@ export function UsersByRoleChart({
                 {data.map((item, index) => (
                   <Cell
                     key={`${item.role}-${index}`}
-                    fill={roleColors[item.role] ?? ['#8B5CF6', '#06B6D4', '#10B981'][index % 3]}
+                    fill={
+                      roleColors[item.role] ??
+                      ['#8B5CF6', '#06B6D4', '#10B981'][index % 3]
+                    }
                   />
                 ))}
               </Pie>
@@ -64,7 +76,9 @@ export function UsersByRoleChart({
               <Legend
                 verticalAlign='bottom'
                 formatter={(value) => (
-                  <span className='text-sm text-slate-400'>{String(value)}</span>
+                  <span className='text-sm text-slate-400'>
+                    {String(value)}
+                  </span>
                 )}
               />
               <text

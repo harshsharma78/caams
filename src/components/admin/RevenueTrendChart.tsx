@@ -40,7 +40,7 @@ export function RevenueTrendChart({
       </div>
       {hasData ? (
         <div
-          className='h-[300px]'
+          className='h-75'
           aria-label='Revenue trend chart'
           role='img'>
           <ResponsiveContainer

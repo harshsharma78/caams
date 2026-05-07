@@ -2,13 +2,14 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 
 import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import {
   Select,
   SelectContent,
@@ -19,6 +20,9 @@ import {
 import { Spinner } from '@/components/ui/Spinner';
 import { organizationSchema } from '@/lib/validations';
 import type { OrganizationFormValues } from '@/types';
+
+/** Max file size for client-side validation (10 MB) */
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
 interface OrganizationFormProps {
   mode: 'create' | 'edit';
@@ -53,6 +57,14 @@ export function OrganizationForm({
   const [isUploading, setIsUploading] = useState(false);
   const [isPending, startTransition] = useTransition();
 
+  // Track whether anything has changed from initial values (Task 6)
+  const hasChanges = useMemo(() => {
+    if (mode === 'create') return true;
+    return (Object.keys(initialValues) as (keyof OrganizationFormValues)[]).some(
+      (key) => values[key] !== initialValues[key],
+    );
+  }, [mode, values, initialValues]);
+
   const handleChange = <K extends keyof OrganizationFormValues>(
     key: K,
     value: OrganizationFormValues[K],
@@ -65,6 +77,12 @@ export function OrganizationForm({
       ...currentErrors,
       [key]: '',
     }));
+  };
+
+  // Prevent alphabetic input in phone field (Task 15)
+  const handlePhoneChange = (rawValue: string) => {
+    const numericOnly = rawValue.replace(/[^0-9+\s()-]/g, '');
+    handleChange('phone', numericOnly);
   };
 
   return (
@@ -150,7 +168,7 @@ export function OrganizationForm({
                   handleChange('size', value as OrganizationFormValues['size'])
                 }>
                 <SelectTrigger>
-                  <SelectValue placeholder='Select organization size' />
+                  <SelectValue placeholder='Select Organization Size' />
                 </SelectTrigger>
                 <SelectContent className='border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50'>
                   <SelectItem value='startup'>Startup</SelectItem>
@@ -183,20 +201,19 @@ export function OrganizationForm({
               value={values.email}
               onChange={(event) => handleChange('email', event.target.value)}
               placeholder='Enter Contact Email'
-              type='email'
               error={fieldErrors.email}
             />
             <Input
               label='Phone Number'
               value={values.phone}
-              onChange={(event) => handleChange('phone', event.target.value)}
+              onChange={(event) => handlePhoneChange(event.target.value)}
               placeholder='Enter Phone Number'
               error={fieldErrors.phone}
             />
-            <Input
+            <AddressAutocomplete
               label='Address'
               value={values.address}
-              onChange={(event) => handleChange('address', event.target.value)}
+              onChange={(value) => handleChange('address', value)}
               placeholder='Enter Address'
               error={fieldErrors.address}
             />
@@ -209,7 +226,7 @@ export function OrganizationForm({
                 onChange={(event) =>
                   handleChange('logoUrl', event.target.value)
                 }
-                placeholder='https://res.cloudinary.com/...'
+                placeholder='Enter Logo URL'
                 error={fieldErrors.logoUrl}
               />
               <label className='block space-y-1.5'>
@@ -225,6 +242,11 @@ export function OrganizationForm({
                     const file = event.target.files?.[0];
 
                     if (!file) {
+                      return;
+                    }
+
+                    if (file.size > MAX_FILE_SIZE_BYTES) {
+                      setUploadError('File size must not exceed 10 MB.');
                       return;
                     }
 
@@ -284,6 +306,7 @@ export function OrganizationForm({
           {error ? <p className='text-sm text-rose-600'>{error}</p> : null}
           <div className='flex flex-col gap-3 sm:flex-row sm:justify-end'>
             <Button
+              type='button'
               variant='outline'
               disabled={isPending || isUploading}
               onClick={() =>
@@ -297,7 +320,7 @@ export function OrganizationForm({
             </Button>
             <Button
               type='submit'
-              disabled={isPending || isUploading}>
+              disabled={isPending || isUploading || !hasChanges}>
               {isPending
                 ? mode === 'create'
                   ? 'Creating...'

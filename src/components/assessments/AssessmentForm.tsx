@@ -46,9 +46,7 @@ function buildInitialResponses() {
 
 export function AssessmentForm({ organizations }: AssessmentFormProps) {
   const router = useRouter();
-  const [organizationId, setOrganizationId] = useState(
-    organizations[0]?.id ?? '',
-  );
+  const [organizationId, setOrganizationId] = useState('');
   const [responses, setResponses] = useState<CategoryResponses>(
     buildInitialResponses,
   );
@@ -106,7 +104,7 @@ export function AssessmentForm({ organizations }: AssessmentFormProps) {
             value={organizationId}
             onValueChange={setOrganizationId}>
             <SelectTrigger>
-              <SelectValue placeholder='Select organization' />
+              <SelectValue placeholder='Select Organization' />
             </SelectTrigger>
             <SelectContent className='border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50'>
               {organizations.map((organization) => (

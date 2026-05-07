@@ -11,6 +11,7 @@ import { DeleteCaseStudyButton } from '@/components/casestudies/DeleteCaseStudyB
 import { Card, CardContent } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Input } from '@/components/ui/Input';
+import { Pagination } from '@/components/ui/Pagination';
 import {
   Select,
   SelectContent,
@@ -20,6 +21,8 @@ import {
 } from '@/components/ui/select';
 import { CASE_STUDY_SECTORS } from '@/lib/validations';
 import type { CaseStudyListItem } from '@/types';
+
+const PAGE_SIZE = 10;
 
 interface CaseStudyLibraryProps {
   caseStudies: CaseStudyListItem[];
@@ -32,6 +35,7 @@ export function CaseStudyLibrary({
 }: CaseStudyLibraryProps) {
   const [search, setSearch] = useState('');
   const [sector, setSector] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredCaseStudies = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -47,6 +51,14 @@ export function CaseStudyLibrary({
     });
   }, [caseStudies, search, sector]);
 
+  const totalItems = filteredCaseStudies.length;
+  const pageCount = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  const safePage = Math.min(currentPage, pageCount);
+  const pagedCaseStudies = filteredCaseStudies.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
+
   return (
     <div className='space-y-6'>
       <Card>
@@ -54,7 +66,10 @@ export function CaseStudyLibrary({
           <Input
             label='Search'
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setCurrentPage(1);
+            }}
             placeholder='Search by title or organization'
           />
           <label className='block space-y-1.5'>
@@ -63,7 +78,10 @@ export function CaseStudyLibrary({
             </span>
             <Select
               value={sector}
-              onValueChange={setSector}>
+              onValueChange={(value) => {
+                setSector(value);
+                setCurrentPage(1);
+              }}>
               <SelectTrigger>
                 <SelectValue placeholder='Filter by sector' />
               </SelectTrigger>
@@ -83,7 +101,7 @@ export function CaseStudyLibrary({
       </Card>
 
       <div className='grid gap-5 md:grid-cols-2 xl:grid-cols-3'>
-        {filteredCaseStudies.map((caseStudy) => (
+        {pagedCaseStudies.map((caseStudy) => (
           <Card
             key={caseStudy.id}
             className='overflow-hidden'>
@@ -133,14 +151,14 @@ export function CaseStudyLibrary({
                 <div className='text-sm text-slate-500 dark:text-slate-400'>
                   {caseStudy.fileUrl ? 'PDF attached' : 'No file attached'}
                 </div>
-                <div className='flex items-center gap-3'>
+                <div className='flex items-center gap-2'>
                   {canManage ? (
                     <>
-                      <Link
-                        href={`/casestudies/${caseStudy.id}/edit`}
-                        className='text-sm font-medium text-sky-600 transition hover:text-sky-700'>
-                        Edit
-                      </Link>
+                      <Button asChild variant='outline' size='sm'>
+                        <Link href={`/casestudies/${caseStudy.id}/edit`}>
+                          Edit
+                        </Link>
+                      </Button>
                       <DeleteCaseStudyButton
                         id={caseStudy.id}
                         title={caseStudy.title}
@@ -156,6 +174,16 @@ export function CaseStudyLibrary({
           </Card>
         ))}
       </div>
+
+      {totalItems > PAGE_SIZE && (
+        <Pagination
+          currentPage={safePage}
+          totalItems={totalItems}
+          pageSize={PAGE_SIZE}
+          onPageChange={setCurrentPage}
+          itemLabel='case studies'
+        />
+      )}
 
       {!filteredCaseStudies.length ? (
         caseStudies.length === 0 ? (
@@ -175,6 +203,7 @@ export function CaseStudyLibrary({
             onAction={() => {
               setSearch('');
               setSector('all');
+              setCurrentPage(1);
             }}
           />
         )

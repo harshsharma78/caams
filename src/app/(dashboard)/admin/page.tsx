@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { ShieldAlert } from 'lucide-react';
+import { AlertTriangle, ShieldAlert } from 'lucide-react';
 
 import { AdminDashboardActions } from '@/components/admin/AdminDashboardActions';
 import { AdminStatsCardGrid } from '@/components/admin/AdminStatsCardGrid';
@@ -149,9 +149,10 @@ export default async function AdminPage() {
       </div>
 
       {data.criticalAlerts > 0 ? (
-        <div className='rounded-lg border border-red-700 bg-red-950/40 p-3 text-red-300'>
-          ⚠ {data.criticalAlerts.toLocaleString()} critical alerts require your
-          attention
+        <div className='flex items-center gap-2 rounded-lg border border-red-700 bg-red-950/40 p-3 text-red-300'>
+          <AlertTriangle className='h-4 w-4 shrink-0' />
+          <span>{data.criticalAlerts.toLocaleString()} critical alerts require your
+          attention</span>
         </div>
       ) : null}
 
@@ -163,7 +164,7 @@ export default async function AdminPage() {
         subtitle='Registration, role distribution, and platform access patterns.'
       />
       <div className='grid gap-6 xl:grid-cols-3'>
-        <div className='xl:col-span-2'>
+        <div className='min-w-0 xl:col-span-2'>
           <UserGrowthChart data={data.userGrowthTrend} />
         </div>
         <UsersByRoleChart
@@ -178,8 +179,12 @@ export default async function AdminPage() {
         subtitle='Operational security signals and high-level audit activity.'
       />
       <div className='grid gap-6 xl:grid-cols-2'>
-        <AuditEventsTrendChart data={data.auditTrend} />
-        <AuditEventsByTypeChart data={data.auditEventsByType} />
+        <div className='min-w-0'>
+          <AuditEventsTrendChart data={data.auditTrend} />
+        </div>
+        <div className='min-w-0'>
+          <AuditEventsByTypeChart data={data.auditEventsByType} />
+        </div>
       </div>
 
       <div className='border-t border-slate-800 my-2' />
@@ -188,8 +193,12 @@ export default async function AdminPage() {
         subtitle='API reliability, database status, and live session footprint.'
       />
       <div className='grid gap-6 xl:grid-cols-2'>
-        <SystemErrorTrendChart data={data.systemErrorTrend} />
-        <SystemHealthCard data={data.systemHealth} />
+        <div className='min-w-0'>
+          <SystemErrorTrendChart data={data.systemErrorTrend} />
+        </div>
+        <div className='min-w-0'>
+          <SystemHealthCard data={data.systemHealth} />
+        </div>
       </div>
 
       <div className='border-t border-slate-800 my-2' />
@@ -198,11 +207,15 @@ export default async function AdminPage() {
         subtitle='Recurring revenue, plan mix, and subscription health.'
       />
       <div className='grid gap-6 xl:grid-cols-2'>
-        <RevenueTrendChart data={data.revenueTrend} />
-        <SubscriptionBreakdownChart
-          data={data.subscriptionBreakdown}
-          totalMonthlyRevenue={data.totalMonthlyRevenue}
-        />
+        <div className='min-w-0'>
+          <RevenueTrendChart data={data.revenueTrend} />
+        </div>
+        <div className='min-w-0'>
+          <SubscriptionBreakdownChart
+            data={data.subscriptionBreakdown}
+            totalMonthlyRevenue={data.totalMonthlyRevenue}
+          />
+        </div>
       </div>
 
       <div className='border-t border-slate-800 my-2' />
@@ -211,16 +224,20 @@ export default async function AdminPage() {
         subtitle='Readiness, industry, and security performance across all organizations.'
       />
       <div className='grid gap-6 xl:grid-cols-3'>
-        <div className='xl:col-span-2'>
+        <div className='min-w-0 xl:col-span-2'>
           <AssessmentScoresByIndustry data={data.scoresByIndustry} />
         </div>
         <RiskDistributionChart data={data.riskDistribution} />
       </div>
       <div className='grid gap-6 xl:grid-cols-2'>
-        <CategoryRadarChart data={data.categoryAverages} />
-        <SecurityComplianceHeatmap
-          data={data.securityCategoryBreakdown}
-        />
+        <div className='min-w-0'>
+          <CategoryRadarChart data={data.categoryAverages} />
+        </div>
+        <div className='min-w-0'>
+          <SecurityComplianceHeatmap
+            data={data.securityCategoryBreakdown}
+          />
+        </div>
       </div>
 
       <div className='border-t border-slate-800 my-2' />
@@ -234,17 +251,21 @@ export default async function AdminPage() {
       />
 
       <div className='grid gap-6 xl:grid-cols-3'>
-        <div className='xl:col-span-2'>
+        <div className='min-w-0 xl:col-span-2'>
           <TopOrganizationsOverview data={data.topOrganizationsByActivity} />
         </div>
-        <InactiveOrgsPanel data={data.inactiveOrganizations} />
+        <div className='min-w-0'>
+          <InactiveOrgsPanel data={data.inactiveOrganizations} />
+        </div>
       </div>
 
       <div className='grid gap-6 xl:grid-cols-3'>
-        <div className='xl:col-span-2'>
+        <div className='min-w-0 xl:col-span-2'>
           <AuditLogFeed data={data.recentAuditLogs} />
         </div>
-        <RecentActivityFeed data={data.recentActivity} />
+        <div className='min-w-0'>
+          <RecentActivityFeed data={data.recentActivity} />
+        </div>
       </div>
     </div>
   );

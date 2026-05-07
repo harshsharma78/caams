@@ -88,7 +88,7 @@ export function InterviewFilters({
               value={currentOrgId || 'all'}
               onValueChange={(value) => updateFilter('orgId', value)}>
               <SelectTrigger>
-                <SelectValue placeholder='All organizations' />
+                <SelectValue placeholder='Select Organization' />
               </SelectTrigger>
               <SelectContent className='border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50'>
                 <SelectItem value='all'>All organizations</SelectItem>

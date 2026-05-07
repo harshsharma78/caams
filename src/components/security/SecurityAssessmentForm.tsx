@@ -50,7 +50,7 @@ export function SecurityAssessmentForm({
 }: SecurityAssessmentFormProps) {
   const router = useRouter();
   const [orgId, setOrgId] = useState(
-    initialValues?.orgId ?? organizations[0]?.id ?? '',
+    initialValues?.orgId ?? '',
   );
   const [checklist, setChecklist] = useState(() => {
     const defaultChecklist = buildDefaultSecurityChecklist();
@@ -68,6 +68,20 @@ export function SecurityAssessmentForm({
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
+
+  // Track whether anything has changed from initial values (Task 6)
+  const hasChanges = useMemo(() => {
+    if (mode === 'create') return orgId !== '';
+    if (!initialValues) return true;
+    if (orgId !== initialValues.orgId) return true;
+    return checklist.some((item, index) => {
+      const original = initialValues.checklist?.[index];
+      if (!original) return true;
+      return (
+        item.status !== original.status || item.notes !== original.notes
+      );
+    });
+  }, [mode, orgId, checklist, initialValues]);
 
   const groupedChecklist = useMemo(() => {
     return checklist.reduce<Record<string, SecurityChecklistItem[]>>(
@@ -98,7 +112,7 @@ export function SecurityAssessmentForm({
               value={orgId}
               onValueChange={setOrgId}>
               <SelectTrigger>
-                <SelectValue placeholder='Select organization' />
+                <SelectValue placeholder='Select Organization' />
               </SelectTrigger>
               <SelectContent className='border-slate-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50'>
                 {organizations.map((organization) => (
@@ -190,7 +204,7 @@ export function SecurityAssessmentForm({
                           [`checklist.${globalIndex}.notes`]: '',
                         }));
                       }}
-                      placeholder='Document evidence, gaps, or context for this control.'
+                      placeholder='Enter Notes'
                     />
                   </div>
                 </div>
@@ -229,7 +243,7 @@ export function SecurityAssessmentForm({
             </Button>
             <Button
               type='button'
-              disabled={isPending}
+              disabled={isPending || !hasChanges}
               onClick={() => {
                 const payload = { orgId, checklist };
                 const parsed = securityAssessmentSchema.safeParse(payload);

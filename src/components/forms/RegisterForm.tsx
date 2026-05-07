@@ -155,7 +155,7 @@ export function RegisterForm() {
                       onValueChange={field.onChange}
                       defaultValue={field.value}>
                       <SelectTrigger className='border-slate-800 bg-slate-900 text-slate-50 focus:ring-slate-700'>
-                        <SelectValue placeholder='Select a role' />
+                        <SelectValue placeholder='Select Role' />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value='assessor'>Assessor</SelectItem>

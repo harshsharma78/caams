@@ -37,20 +37,20 @@ export function AdminDashboardSkeleton() {
           <Block className='h-6 w-56' />
           <Block className='h-4 w-72' />
           <div className='grid gap-6 xl:grid-cols-2'>
-            <Block className='h-[380px]' />
-            <Block className='h-[380px]' />
+            <Block className='h-95' />
+            <Block className='h-95' />
           </div>
         </div>
       ))}
 
-      <Block className='h-[420px]' />
+      <Block className='h-105' />
       <div className='grid gap-6 xl:grid-cols-3'>
-        <Block className='h-[420px] xl:col-span-2' />
-        <Block className='h-[420px]' />
+        <Block className='h-105 xl:col-span-2' />
+        <Block className='h-105' />
       </div>
       <div className='grid gap-6 xl:grid-cols-3'>
-        <Block className='h-[420px] xl:col-span-2' />
-        <Block className='h-[420px]' />
+        <Block className='h-105 xl:col-span-2' />
+        <Block className='h-105' />
       </div>
     </div>
   );

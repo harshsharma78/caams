@@ -45,7 +45,7 @@ export function AuditEventsByTypeChart({
       </div>
       {hasData ? (
         <div
-          className='h-[300px]'
+          className='h-75'
           aria-label='Audit events by type chart'
           role='img'>
           <ResponsiveContainer

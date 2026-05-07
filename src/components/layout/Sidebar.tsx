@@ -52,37 +52,39 @@ export function Sidebar({ open, role, onClose }: SidebarProps) {
             : '-translate-x-full w-72 px-5 md:translate-x-0 md:w-20 md:px-4 lg:w-72 lg:px-5',
         ].join(' ')}>
         <div className='flex flex-col items-center lg:items-start lg:space-y-1'>
+          {/* Desktop (lg+): show full branding */}
           <p className='hidden text-xs font-semibold uppercase tracking-[0.24em] text-sky-600 dark:text-sky-400 lg:block'>
             CAAMS
           </p>
-          {/* Mobile view of title when open */}
-          {open && (
-            <p className='text-xs font-semibold uppercase tracking-[0.24em] text-sky-600 dark:text-sky-400 lg:hidden'>
-              CAAMS
-            </p>
-          )}
           <h2 className='hidden text-2xl font-semibold text-slate-900 dark:text-slate-50 lg:block'>
             Cloud Adoption
           </h2>
-          {open && (
-            <h2 className='text-2xl font-semibold text-slate-900 dark:text-slate-50 lg:hidden'>
-              Cloud Adoption
-            </h2>
-          )}
           <p className='hidden text-sm text-slate-500 dark:text-slate-400 lg:block'>
             Signed in as {role === 'admin' ? 'Administrator' : 'Assessor'}
           </p>
+
+          {/* Mobile (when open): show full branding */}
           {open && (
-            <p className='text-sm text-slate-500 dark:text-slate-400 lg:hidden'>
-              Signed in as {role === 'admin' ? 'Administrator' : 'Assessor'}
-            </p>
+            <>
+              <p className='text-xs font-semibold uppercase tracking-[0.24em] text-sky-600 dark:text-sky-400 lg:hidden'>
+                CAAMS
+              </p>
+              <h2 className='text-2xl font-semibold text-slate-900 dark:text-slate-50 lg:hidden'>
+                Cloud Adoption
+              </h2>
+              <p className='text-sm text-slate-500 dark:text-slate-400 lg:hidden'>
+                Signed in as {role === 'admin' ? 'Administrator' : 'Assessor'}
+              </p>
+            </>
           )}
 
-          {/* Tablet collapsed view logo */}
-          <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-sky-100 font-bold text-sky-700 dark:bg-sky-900/50 dark:text-sky-400 lg:hidden'>
-            <span className={open ? 'hidden' : 'block'}>C</span>
-            {open && <span className='hidden'>C</span>}
-          </div>
+          {/* Tablet collapsed view: just show "CAAMS" text (no logo box) */}
+          <span className={[
+            'text-xs font-bold uppercase tracking-[0.24em] text-sky-600 dark:text-sky-400 lg:hidden',
+            open ? 'hidden' : 'hidden md:block',
+          ].join(' ')}>
+            CAAMS
+          </span>
         </div>
         <nav className='mt-8 space-y-2'>
           {navigation
